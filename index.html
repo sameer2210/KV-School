@@ -1,0 +1,93 @@
+<!-- Prompt 7 :- Design a simple landing page for a new mobile app with a download button. -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App Landing Page</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-teal-500 via-teal-400 to-cyan-500">
+
+   <main>
+    <nav class="flex bg-[#10193A] items-center p-2 text-xl gap-10 text-white justify-around ">
+        <div class="link  space-x-28  ">
+            <a href="">Home</a>
+            <a href="">Product</a>
+            <a href="">Contact</a>
+            <a href="">Blog</a>
+            <a href="">About</a> 
+        </div>
+        <button class=" text-xl bg-cyan-900 text-white px-6 py-2 rounded-lg ">Sign in</button>
+    </nav>
+   </main>
+  <section class="min-h-screen flex items-center text-white">
+    
+    <div class="container mx-auto px-6 lg:px-12 flex flex-col lg:flex-row items-center">
+      <div class="lg:w-1/2 text-center lg:text-left">
+        <h1 class="text-5xl font-bold leading-tight mb-6 animate-fade-in-down">
+          Experience the Future of <br>
+          <span class="text-cyan-900 text-8xl">CoreSync</span>
+        </h1>
+        <p class="text-lg mb-6 animate-fade-in text-gray-200">Download our app to simplify your life and enjoy seamless, intuitive features designed for you.</p>
+        <div>
+          <a href="#" class="bg-cyan-300 text-teal-700 px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-cyan-200 transition animate-bounce">Download for iOS</a>
+          <a href="#" class="bg-white text-teal-700 px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-gray-100 transition ml-4 animate-bounce">Download for Android</a>
+        </div>
+      </div>
+      <div class="lg:w-1/2 mt-12 lg:mt-0 animate-slide-in-right">
+        <img src="https://images.unsplash.com/photo-1614680376739-414d95ff43df?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="App Screenshot" class="rounded-lg shadow-lg">
+      </div>
+      <div class="relative w-full lg:w-1/2 mt-8 lg:mt-0 animate-fadeIn">
+        <div class="absolute w-40 h-36 bg-red-700 blur-2xl rounded-full top-0 left-16"></div>
+    </div>
+    </div>
+  </section>
+
+  <style>
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fade-in-down {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slide-in-right {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .animate-fade-in {
+      animation: fade-in 1.5s ease-out;
+    }
+
+    .animate-fade-in-down {
+      animation: fade-in-down 1s ease-out;
+    }
+
+    .animate-slide-in-right {
+      animation: slide-in-right 1s ease-out;
+    }
+  </style>
+</body>
+</html>
