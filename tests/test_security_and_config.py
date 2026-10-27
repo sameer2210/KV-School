@@ -133,3 +133,34 @@ def test_database_migration_from_preexisting_schema(tmp_path):
         assert tx.receipt_number == 'REC202604010001'
         assert hasattr(tx, 'status')
         assert hasattr(tx, 'reversal_reason')
+
+
+def test_vercel_environment_instance_path(monkeypatch):
+    """Test: Vercel environment uses writable temporary directory without touching read-only deployment path"""
+    from app.config import is_running_on_vercel, get_instance_path
+    import tempfile
+
+    monkeypatch.setenv('VERCEL', '1')
+    assert is_running_on_vercel() is True
+
+    vercel_instance = get_instance_path()
+    assert tempfile.gettempdir() in vercel_instance or vercel_instance.startswith('/tmp')
+
+    # Verify app initialization under Vercel configuration
+    class VercelConfig(TestingConfig):
+        INSTANCE_PATH = vercel_instance
+
+    vercel_app = create_app(VercelConfig)
+    assert vercel_app is not None
+    assert vercel_app.instance_path == vercel_instance
+
+
+def test_vercel_database_url_preservation(monkeypatch):
+    """Test: PostgreSQL/Supabase database URL is preserved for persistent storage in Vercel mode"""
+    from app.config import get_database_url
+
+    monkeypatch.setenv('VERCEL', '1')
+    monkeypatch.setenv('DATABASE_URL', 'postgres://postgres:securepass@db.supabase.co:5432/postgres')
+    
+    url = get_database_url()
+    assert url == 'postgresql://postgres:securepass@db.supabase.co:5432/postgres'

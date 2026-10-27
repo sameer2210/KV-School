@@ -23,7 +23,11 @@ login_manager.login_message_category = 'info'
 
 def create_app(config_class=Config):
     """Application factory pattern"""
-    app = Flask(__name__)
+    instance_path = getattr(config_class, 'INSTANCE_PATH', None)
+    if instance_path:
+        app = Flask(__name__, instance_path=instance_path)
+    else:
+        app = Flask(__name__)
     app.config.from_object(config_class)
 
     # Initialize extensions with app
@@ -53,9 +57,12 @@ def create_app(config_class=Config):
 
     # Create database tables and seed data
     with app.app_context():
-        db.create_all()
-        ensure_schema_upgrades()
-        seed_database()
+        try:
+            db.create_all()
+            ensure_schema_upgrades()
+            seed_database()
+        except Exception as e:
+            app.logger.warning(f"Database auto-setup deferred or failed: {e}")
 
     return app
 

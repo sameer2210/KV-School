@@ -57,7 +57,12 @@ def upload_image():
     try:
         # Create uploads directory if it doesn't exist
         upload_folder = os.path.join(current_app.root_path, 'static', 'uploads', 'announcements')
-        os.makedirs(upload_folder, exist_ok=True)
+        try:
+            os.makedirs(upload_folder, exist_ok=True)
+        except OSError:
+            import tempfile
+            upload_folder = os.path.join(tempfile.gettempdir(), 'uploads', 'announcements')
+            os.makedirs(upload_folder, exist_ok=True)
         
         # Generate secure filename with timestamp
         filename = secure_filename(file.filename)

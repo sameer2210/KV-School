@@ -51,8 +51,13 @@ def save_uploaded_file(file, folder='uploads'):
         name, ext = os.path.splitext(filename)
         filename = f"{name}_{datetime.now().strftime('%Y%m%d%H%M%S')}{ext}"
         
-        upload_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], folder)
-        os.makedirs(upload_folder, exist_ok=True)
+        upload_folder = os.path.join(current_app.config.get('UPLOAD_FOLDER', os.path.join(tempfile.gettempdir(), 'uploads')), folder)
+        try:
+            os.makedirs(upload_folder, exist_ok=True)
+        except OSError:
+            import tempfile
+            upload_folder = os.path.join(tempfile.gettempdir(), 'uploads', folder)
+            os.makedirs(upload_folder, exist_ok=True)
         
         filepath = os.path.join(upload_folder, filename)
         file.save(filepath)

@@ -2,6 +2,7 @@
 Application Configuration
 """
 import os
+import tempfile
 from datetime import timedelta
 from dotenv import load_dotenv
 
@@ -10,16 +11,53 @@ basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 # Load environment variables from .env file
 load_dotenv(os.path.join(basedir, '.env'))
 
-# Ensure instance directory exists
-instance_path = os.path.join(basedir, 'instance')
-if not os.path.exists(instance_path):
-    os.makedirs(instance_path)
+
+def is_running_on_vercel():
+    """Detect if the application is running in Vercel serverless environment"""
+    return bool(
+        os.environ.get('VERCEL') == '1'
+        or os.environ.get('VERCEL_ENV')
+        or os.environ.get('AWS_LAMBDA_FUNCTION_NAME')
+        or os.environ.get('LAMBDA_TASK_ROOT')
+    )
+
+
+def get_instance_path():
+    """
+    Get the instance directory path.
+    On Vercel and serverless read-only filesystems, use /tmp or system temp directory.
+    On local/persistent environments, use the project instance directory.
+    """
+    custom_instance = os.environ.get('FLASK_INSTANCE_PATH')
+    if custom_instance:
+        instance_dir = custom_instance
+    elif is_running_on_vercel():
+        instance_dir = os.path.join(tempfile.gettempdir(), 'instance')
+    else:
+        instance_dir = os.path.join(basedir, 'instance')
+
+    # Ensure the directory exists if writable; if read-only, fallback to tempdir
+    if not os.path.exists(instance_dir):
+        try:
+            os.makedirs(instance_dir, exist_ok=True)
+        except OSError:
+            instance_dir = os.path.join(tempfile.gettempdir(), 'instance')
+            try:
+                os.makedirs(instance_dir, exist_ok=True)
+            except OSError:
+                pass
+
+    return instance_dir
+
+
+instance_path = get_instance_path()
 
 
 def get_database_url():
     """Get database URL with Supabase compatibility fix and safe SQLite fallback"""
+    current_instance_path = get_instance_path()
     if os.environ.get('USE_SQLITE', '').lower() in ['1', 'true', 'yes']:
-        return 'sqlite:///' + os.path.join(basedir, 'instance', 'sarva_gyaan.db')
+        return 'sqlite:///' + os.path.join(current_instance_path, 'sarva_gyaan.db')
 
     url = os.environ.get('DATABASE_URL')
     if url:
@@ -27,20 +65,23 @@ def get_database_url():
         placeholders = ['[YOUR-PASSWORD]', '[YOUR-PROJECT-REF]', 'localhost:5432/postgres']
         if any(p in url for p in placeholders):
             # Placeholder URL detected; fallback to SQLite
-            return 'sqlite:///' + os.path.join(basedir, 'instance', 'sarva_gyaan.db')
+            return 'sqlite:///' + os.path.join(current_instance_path, 'sarva_gyaan.db')
 
         # Supabase uses 'postgres://' but SQLAlchemy requires 'postgresql://'
         if url.startswith('postgres://'):
             url = url.replace('postgres://', 'postgresql://', 1)
         return url
     # Fallback to SQLite for local development
-    return 'sqlite:///' + os.path.join(basedir, 'instance', 'sarva_gyaan.db')
+    return 'sqlite:///' + os.path.join(current_instance_path, 'sarva_gyaan.db')
 
 
 class Config:
     """Base configuration"""
     # Secret key for session management
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'sarva-gyaan-academy-secret-key-2024'
+
+    # Instance directory path
+    INSTANCE_PATH = instance_path
 
     # Database configuration
     SQLALCHEMY_DATABASE_URI = get_database_url()
@@ -54,7 +95,7 @@ class Config:
 
     # Upload configuration
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB max upload
-    UPLOAD_FOLDER = os.path.join(os.path.dirname(basedir), 'uploads')
+    UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), 'uploads') if is_running_on_vercel() else os.path.join(basedir, 'uploads')
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf', 'csv', 'xlsx'}
 
     # Pagination
