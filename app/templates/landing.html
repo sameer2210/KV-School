@@ -1,1160 +1,796 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="PM SHRI Kendriya Vidyalaya - Expert coaching for Class 6-12, CUET, JEE & NEET preparation. Shaping futures since 2025.">
-    <meta name="keywords" content="coaching, tuition, JEE, NEET, CUET, CBSE, ICSE, Faridabad, academy">
-    <title>PM SHRI Kendriya Vidyalaya - Shaping Futures</title>
+    <meta name="description" content="PM SHRI Kendriya Vidyalaya No. 1, Ordnance Factory, Itarsi — An autonomous institution under the Ministry of Education, Government of India. CBSE Affiliation No. 1000015. Established in 1980.">
+    <meta name="keywords" content="PM SHRI Kendriya Vidyalaya No. 1 Itarsi, KV Itarsi, Ordnance Factory Itarsi, KVS Bhopal, CBSE School Itarsi, PM SHRI School">
+    <title>PM SHRI Kendriya Vidyalaya No. 1, Ordnance Factory, Itarsi</title>
 
-    <!-- Fonts -->
+    <!-- Google Fonts: Plus Jakarta Sans for crisp editorial typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,750;0,800;1,400&display=swap" rel="stylesheet">
 
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
 
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --primary-light: #3b82f6;
-            --secondary: #0f172a;
-            --accent: #f59e0b;
-            --success: #10b981;
-            --text-dark: #1e293b;
-            --text-light: #64748b;
-            --white: #ffffff;
-            --bg-light: #f8fafc;
-            --gradient: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            color: var(--text-dark);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Navigation */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            padding: 15px 0;
-            transition: all 0.3s ease;
-        }
-
-        .navbar.scrolled {
-            background: rgba(255, 255, 255, 0.98);
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-            padding: 10px 0;
-        }
-
-        .navbar .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-icon {
-            width: 45px;
-            height: 45px;
-            background: var(--gradient);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 18px;
-        }
-
-        .logo-text {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--white);
-        }
-
-        .navbar.scrolled .logo-text {
-            color: var(--secondary);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 35px;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 500;
-            font-size: 15px;
-            transition: color 0.3s;
-        }
-
-        .navbar.scrolled .nav-links a {
-            color: var(--text-dark);
-        }
-
-        .nav-links a:hover {
-            color: var(--accent);
-        }
-
-        .nav-cta {
-            display: flex;
-            gap: 15px;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 28px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            color: white;
-        }
-
-        .navbar.scrolled .btn-outline {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .btn-outline:hover {
-            background: white;
-            color: var(--primary);
-            border-color: white;
-        }
-
-        .btn-primary {
-            background: var(--accent);
-            color: var(--secondary);
-        }
-
-        .btn-primary:hover {
-            background: #d97706;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3);
-        }
-
-        .btn-large {
-            padding: 16px 36px;
-            font-size: 16px;
-        }
-
-        /* Mobile Menu */
-        .mobile-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 28px;
-            cursor: pointer;
-        }
-
-        .navbar.scrolled .mobile-toggle {
-            color: var(--secondary);
-        }
-
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%);
-            position: relative;
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 80%;
-            height: 150%;
-            background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, transparent 70%);
-        }
-
-        .hero::after {
-            content: '';
-            position: absolute;
-            bottom: -30%;
-            left: -10%;
-            width: 50%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(124, 58, 237, 0.1) 0%, transparent 70%);
-        }
-
-        .hero-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            padding: 8px 16px;
-            border-radius: 50px;
-            color: var(--accent);
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 20px;
-        }
-
-        .hero h1 {
-            font-size: 56px;
-            font-weight: 800;
-            color: white;
-            line-height: 1.1;
-            margin-bottom: 20px;
-        }
-
-        .hero h1 span {
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero-tagline {
-            font-size: 22px;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 35px;
-            font-weight: 300;
-        }
-
-        .hero-stats {
-            display: flex;
-            gap: 40px;
-            margin-top: 50px;
-        }
-
-        .hero-stat {
-            text-align: center;
-        }
-
-        .hero-stat h3 {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--accent);
-        }
-
-        .hero-stat p {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
-        }
-
-        .hero-image {
-            position: relative;
-        }
-
-        .hero-image img {
-            width: 100%;
-            border-radius: 20px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
-        }
-
-        .hero-float-card {
-            position: absolute;
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .hero-float-card.card-1 {
-            bottom: 30px;
-            left: -40px;
-        }
-
-        .hero-float-card.card-2 {
-            top: 30px;
-            right: -30px;
-        }
-
-        .float-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .float-icon.blue {
-            background: rgba(37, 99, 235, 0.1);
-            color: var(--primary);
-        }
-
-        .float-icon.green {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-        }
-
-        .float-text h4 {
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .float-text p {
-            font-size: 13px;
-            color: var(--text-light);
-        }
-
-        /* Features Section */
-        .features {
-            padding: 100px 0;
-            background: var(--bg-light);
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-
-        .section-badge {
-            display: inline-block;
-            background: rgba(37, 99, 235, 0.1);
-            color: var(--primary);
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .section-header h2 {
-            font-size: 42px;
-            font-weight: 700;
-            margin-bottom: 15px;
-        }
-
-        .section-header p {
-            font-size: 18px;
-            color: var(--text-light);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-        }
-
-        .feature-card {
-            background: white;
-            padding: 35px;
-            border-radius: 20px;
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            border-color: var(--primary);
-        }
-
-        .feature-icon {
-            width: 70px;
-            height: 70px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            margin-bottom: 20px;
-        }
-
-        .feature-icon.blue {
-            background: linear-gradient(135deg, #2563eb, #3b82f6);
-            color: white;
-        }
-
-        .feature-icon.purple {
-            background: linear-gradient(135deg, #7c3aed, #8b5cf6);
-            color: white;
-        }
-
-        .feature-icon.orange {
-            background: linear-gradient(135deg, #f59e0b, #fbbf24);
-            color: white;
-        }
-
-        .feature-icon.green {
-            background: linear-gradient(135deg, #10b981, #34d399);
-            color: white;
-        }
-
-        .feature-icon.pink {
-            background: linear-gradient(135deg, #ec4899, #f472b6);
-            color: white;
-        }
-
-        .feature-icon.cyan {
-            background: linear-gradient(135deg, #06b6d4, #22d3ee);
-            color: white;
-        }
-
-        .feature-card h3 {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .feature-card p {
-            color: var(--text-light);
-            font-size: 15px;
-        }
-
-        /* Courses Section */
-        .courses {
-            padding: 100px 0;
-            background: white;
-        }
-
-        .courses-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-        }
-
-        .course-card {
-            background: var(--bg-light);
-            border-radius: 20px;
-            overflow: hidden;
-            display: flex;
-            transition: all 0.3s ease;
-        }
-
-        .course-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        .course-image {
-            width: 200px;
-            min-height: 200px;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .course-content {
-            padding: 30px;
-            flex: 1;
-        }
-
-        .course-badge {
-            display: inline-block;
-            background: var(--primary);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .course-content h3 {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .course-content p {
-            color: var(--text-light);
-            font-size: 14px;
-            margin-bottom: 15px;
-        }
-
-        .course-features {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .course-features span {
-            background: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            color: var(--text-dark);
-        }
-
-        /* Contact Section */
-        .contact {
-            padding: 100px 0;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: white;
-        }
-
-        .contact-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-        }
-
-        .contact-info h2 {
-            font-size: 42px;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        .contact-info>p {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 18px;
-            margin-bottom: 40px;
-        }
-
-        .contact-item {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .contact-icon {
-            width: 55px;
-            height: 55px;
-            background: rgba(37, 99, 235, 0.2);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: var(--primary-light);
-        }
-
-        .contact-text h4 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .contact-text p {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 15px;
-            margin-top: 40px;
-        }
-
-        .social-links a {
-            width: 45px;
-            height: 45px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            color: white;
-            transition: all 0.3s;
-        }
-
-        .social-links a:hover {
-            background: var(--primary);
-            transform: translateY(-3px);
-        }
-
-        /* Enquiry Form */
-        .enquiry-form {
-            background: white;
-            padding: 40px;
-            border-radius: 24px;
-            color: var(--text-dark);
-        }
-
-        .enquiry-form h3 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 25px;
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 14px 18px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 15px;
-            font-family: inherit;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .enquiry-form .btn {
-            width: 100%;
-            justify-content: center;
-            padding: 16px;
-            font-size: 16px;
-        }
-
-        /* Footer */
-        .footer {
-            background: #0a0f1a;
-            color: rgba(255, 255, 255, 0.6);
-            padding: 30px 0;
-            text-align: center;
-        }
-
-        .footer p {
-            font-size: 14px;
-        }
-
-        /* Responsive */
-        @media (max-width: 992px) {
-            .hero-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-
-            .hero h1 {
-                font-size: 42px;
-            }
-
-            .hero-image {
-                display: none;
-            }
-
-            .hero-stats {
-                justify-content: center;
-            }
-
-            .features-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .courses-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .contact-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .nav-links,
-            .nav-cta {
-                display: none;
-            }
-
-            .mobile-toggle {
-                display: block;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 32px;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .course-card {
-                flex-direction: column;
-            }
-
-            .course-image {
-                width: 100%;
-                height: 180px;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .section-header h2 {
-                font-size: 32px;
-            }
-        }
-
-        /* Animations */
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        .hero-float-card {
-            animation: float 3s ease-in-out infinite;
-        }
-
-        .hero-float-card.card-2 {
-            animation-delay: 1s;
-        }
-    </style>
+    <!-- Editorial Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
 </head>
+<body id="top">
 
-<body>
-    <!-- Navigation -->
-    <nav class="navbar" id="navbar">
-        <div class="container">
-            <a href="#" class="logo">
-                <div class="logo-icon">SG</div>
-                <span class="logo-text">PM SHRI Kendriya Vidyalaya</span>
+    <!-- A. TOP BAR: GOVERNMENT & KVS AFFILIATION -->
+    <header class="govt-topbar">
+        <div class="editorial-container govt-topbar-content">
+            <div class="govt-topbar-left">
+                <span class="govt-flag-dot" aria-hidden="true">
+                    <span style="background-color: #f97316;"></span>
+                    <span style="background-color: #ffffff;"></span>
+                    <span style="background-color: #16a34a;"></span>
+                </span>
+                <span>Ministry of Education, Government of India</span>
+                <span style="opacity: 0.35;">|</span>
+                <span>Kendriya Vidyalaya Sangathan (Bhopal Region)</span>
+            </div>
+            <div class="govt-topbar-right">
+                <a href="#about">About</a>
+                <a href="#notices">Notices</a>
+                <a href="https://no1itarasi.kvs.ac.in/en/" target="_blank" rel="noopener noreferrer">Official Portal ↗</a>
+                <a href="{{ url_for('auth.login') }}" style="color: #fdba74; font-weight: 600;">Sign In</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- A. NAVIGATION BAR -->
+    <nav class="site-nav" id="siteNav" aria-label="Main Navigation">
+        <div class="editorial-container nav-inner">
+            <a href="#top" class="nav-brand" aria-label="PM SHRI Kendriya Vidyalaya No. 1 Itarsi Home">
+                <span class="brand-title">PM SHRI Kendriya Vidyalaya No. 1</span>
+                <span class="brand-subtitle">Ordnance Factory, Itarsi • Estd. 1980</span>
             </a>
 
+            <!-- Desktop Nav Links -->
             <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#features">Why Us</a></li>
-                <li><a href="#courses">Courses</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="#top" class="nav-link active">Home</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#academics" class="nav-link">Academics</a></li>
+                <li><a href="#facilities" class="nav-link">Infrastructure</a></li>
+                <li><a href="#activities" class="nav-link">Activities</a></li>
+                <li><a href="#achievements" class="nav-link">Achievements</a></li>
+                <li><a href="#notices" class="nav-link">Notices</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
             </ul>
 
-            <div class="nav-cta">
-                <a href="{{ url_for('auth.login') }}" class="btn btn-outline">
-                    <i class="bi bi-person"></i> Login
+            <!-- Header Action CTA -->
+            <div class="nav-actions">
+                <a href="{{ url_for('auth.login') }}" class="btn-editorial portal-btn">
+                    <i class="bi bi-person-circle"></i>
+                    <span>Portal Login</span>
                 </a>
-                <a href="#contact" class="btn btn-primary">Enquire Now</a>
+                <button class="mobile-menu-toggle" id="mobileMenuBtn" aria-label="Toggle navigation menu" aria-expanded="false">
+                    <i class="bi bi-list" style="font-size: 1.35rem;"></i>
+                </button>
             </div>
+        </div>
 
-            <button class="mobile-toggle" onclick="toggleMenu()">
-                <i class="bi bi-list"></i>
-            </button>
+        <!-- Accessible Mobile Drawer -->
+        <div class="mobile-nav-drawer" id="mobileDrawer">
+            <a href="#top" class="nav-link mobile-nav-link">Home</a>
+            <a href="#about" class="nav-link mobile-nav-link">About the Vidyalaya</a>
+            <a href="#academics" class="nav-link mobile-nav-link">Academics</a>
+            <a href="#facilities" class="nav-link mobile-nav-link">Infrastructure & Spaces</a>
+            <a href="#activities" class="nav-link mobile-nav-link">Activities & Initiatives</a>
+            <a href="#achievements" class="nav-link mobile-nav-link">Achievements</a>
+            <a href="#notices" class="nav-link mobile-nav-link">News & Notices</a>
+            <a href="#contact" class="nav-link mobile-nav-link">Contact & Location</a>
+            <div style="padding-top: 1rem; border-top: var(--border-light);">
+                <a href="{{ url_for('auth.login') }}" class="btn-editorial primary" style="width: 100%;">
+                    <i class="bi bi-lock"></i>
+                    <span>Staff & Student Login</span>
+                </a>
+            </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero" id="home">
-        <div class="container">
-            <div class="hero-content">
-                <div class="hero-text">
-                    <div class="hero-badge">
-                        <i class="bi bi-star-fill"></i>
-                        <span>Shaping Futures Since 2025</span>
+    <main>
+        <!-- B. HERO SECTION (EDITORIAL DRAMA) -->
+        <section class="hero-editorial" aria-label="Hero Introduction">
+            <div class="hero-bg-layer" aria-hidden="true">
+                <img src="{{ url_for('static', filename='img/hero-campus.jpg') }}" alt="PM SHRI Kendriya Vidyalaya No. 1 Itarsi Campus" class="hero-bg-image">
+            </div>
+            <div class="hero-scrim-layer" aria-hidden="true"></div>
+
+            <div class="editorial-container hero-content">
+                <div class="hero-pill">
+                    <span class="hero-pill-badge">PM SHRI</span>
+                    <span>CBSE Affiliation No. 1000015 • KV Code 1113</span>
+                </div>
+
+                <h1 class="hero-headline">
+                    Learning Today.<br>
+                    Leading Tomorrow.
+                </h1>
+
+                <p class="hero-subtext">
+                    Discover a learning environment that nurtures knowledge, creativity, values and innovation at PM SHRI Kendriya Vidyalaya No. 1, Ordnance Factory, Itarsi.
+                </p>
+
+                <div class="hero-actions">
+                    <a href="#about" class="btn-editorial primary">
+                        <span>Explore Our Vidyalaya</span>
+                        <i class="bi bi-arrow-down"></i>
+                    </a>
+                    <a href="#notices" class="btn-editorial secondary">
+                        <span>Latest Updates</span>
+                        <i class="bi bi-bell"></i>
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="editorial-link inverse" style="margin-left: 0.5rem;">
+                        <span>School Portal Login</span>
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- C. SCHOOL IDENTITY STRIP -->
+        <section class="identity-strip" aria-label="Verified Institutional Details">
+            <div class="editorial-container">
+                <div class="identity-grid">
+                    <div class="identity-item">
+                        <div class="identity-label">Establishment</div>
+                        <div class="identity-val">1980</div>
+                        <div class="identity-desc">4+ Decades of Excellence</div>
                     </div>
-                    <h1>Prepares You <span>Best</span> For The Exams</h1>
-                    <p class="hero-tagline">Expert coaching for Class 6-12, CUET, JEE & NEET. Join the academy that
-                        believes in your success.</p>
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: flex-start;">
-                        <a href="#contact" class="btn btn-primary btn-large">
-                            <i class="bi bi-send-fill"></i> Enroll Now
+                    <div class="identity-item">
+                        <div class="identity-label">KV Code</div>
+                        <div class="identity-val">1113</div>
+                        <div class="identity-desc">KVS Bhopal Region</div>
+                    </div>
+                    <div class="identity-item">
+                        <div class="identity-label">CBSE Affiliation</div>
+                        <div class="identity-val">1000015</div>
+                        <div class="identity-desc">Senior Secondary Status</div>
+                    </div>
+                    <div class="identity-item">
+                        <div class="identity-label">School Code</div>
+                        <div class="identity-val">54087</div>
+                        <div class="identity-desc">CBSE Examination Centre</div>
+                    </div>
+                    <div class="identity-item">
+                        <div class="identity-label">UDISE Code</div>
+                        <div class="identity-val">23370406306</div>
+                        <div class="identity-desc">Dept. of School Education</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- D. ABOUT THE VIDYALAYA (SPLIT EDITORIAL LAYOUT) -->
+        <section class="editorial-section canvas" id="about" aria-labelledby="aboutHeading">
+            <div class="editorial-container">
+                <div class="about-grid">
+                    <div class="about-image-wrapper">
+                        <img src="{{ url_for('static', filename='img/about-campus.jpg') }}" alt="PM SHRI Kendriya Vidyalaya No. 1 Itarsi Building Facade" class="about-image">
+                        <div class="about-image-caption">
+                            <i class="bi bi-geo-alt" style="color: var(--color-accent);"></i>
+                            <span>Campus Grounds at Ordnance Factory Estate, Itarsi (M.P.)</span>
+                        </div>
+                    </div>
+
+                    <div class="about-copy">
+                        <span class="section-tag">Institutional Background</span>
+                        <h2 class="section-title" id="aboutHeading">A Legacy of Learning Since 1980</h2>
+                        
+                        <p class="about-lead">
+                            Established in 1980 under the aegis of Kendriya Vidyalaya Sangathan (KVS), PM SHRI Kendriya Vidyalaya No. 1, Ordnance Factory, Itarsi is a distinguished co-educational institution situated in the tranquil, verdant residential estate of the Ordnance Factory, approximately 13 kilometres from Itarsi Junction railway station.
+                        </p>
+
+                        <p class="about-text">
+                            As a recognized PM SHRI (Prime Minister Schools for Rising India) exemplar institution under the Ministry of Education, Government of India, the Vidyalaya spearheads the pedagogical goals of the National Education Policy (NEP) 2020. Our learning environment fosters critical inquiry, cognitive growth, digital literacy, and deep ethical values for students across all classes.
+                        </p>
+
+                        <div class="about-features">
+                            <div class="about-feature-item">
+                                <div class="about-feature-bullet">✓</div>
+                                <div>
+                                    <div class="about-feature-title">Exemplar PM SHRI Pedagogy</div>
+                                    <div class="about-feature-desc">Showcasing NEP 2020 experiential learning, toy-based foundational pedagogy, and modern scientific discovery.</div>
+                                </div>
+                            </div>
+                            <div class="about-feature-item">
+                                <div class="about-feature-bullet">✓</div>
+                                <div>
+                                    <div class="about-feature-title">Eco-Conscious Green Campus</div>
+                                    <div class="about-feature-desc">Spacious campus enveloped by the lush forest canopy of the Ordnance Factory Estate, encouraging environmental stewardship.</div>
+                                </div>
+                            </div>
+                            <div class="about-feature-item">
+                                <div class="about-feature-bullet">✓</div>
+                                <div>
+                                    <div class="about-feature-title">National Unity & Integration</div>
+                                    <div class="about-feature-desc">Nurturing national pride through Ek Bharat Shreshtha Bharat, Kala Utsav, and nationwide sports meets.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 1rem;">
+                            <a href="https://no1itarasi.kvs.ac.in/en/about-kv/" target="_blank" rel="noopener noreferrer" class="editorial-link">
+                                <span>Read Official Institutional Profile on KVS Portal</span>
+                                <i class="bi bi-box-arrow-up-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- E. ACADEMIC OVERVIEW -->
+        <section class="editorial-section muted" id="academics" aria-labelledby="academicsHeading">
+            <div class="editorial-container">
+                <div class="academics-header">
+                    <span class="section-tag">Academic Excellence</span>
+                    <h2 class="section-title" id="academicsHeading">Rigorous Curriculum Aligned with NEP 2020</h2>
+                    <p class="section-lead">
+                        Adhering strictly to the CBSE and NCERT curriculum frameworks, the Vidyalaya provides holistic education across primary, middle, secondary, and senior secondary stages in Science and Commerce streams.
+                    </p>
+                </div>
+
+                <div class="academics-grid">
+                    <!-- 1. Academic Planner -->
+                    <div class="academic-card">
+                        <div class="academic-card-top">
+                            <div class="academic-number">RESOURCE • 01</div>
+                            <h3 class="academic-title">Academic Planner</h3>
+                            <p class="academic-desc">Annual scholastic schedule detailing monthly syllabi, unit assessments, term examination schedules, and curricular milestones.</p>
+                        </div>
+                        <a href="https://no1itarasi.kvs.ac.in/en/" target="_blank" rel="noopener noreferrer" class="editorial-link">
+                            <span>View Calendar ↗</span>
                         </a>
-                        <a href="#courses" class="btn btn-outline btn-large">
-                            <i class="bi bi-book"></i> View Courses
+                    </div>
+
+                    <!-- 2. Result Analysis -->
+                    <div class="academic-card">
+                        <div class="academic-card-top">
+                            <div class="academic-number">EVALUATION • 02</div>
+                            <h3 class="academic-title">Result Analysis</h3>
+                            <p class="academic-desc">Documented CBSE Class X and Class XII Board performance, pass percentages, subject distinctions, and historical academic indicators.</p>
+                        </div>
+                        <a href="https://no1itarasi.kvs.ac.in/en/" target="_blank" rel="noopener noreferrer" class="editorial-link">
+                            <span>Official Analysis ↗</span>
                         </a>
                     </div>
-                    <div class="hero-stats">
-                        <div class="hero-stat">
-                            <h3>500+</h3>
-                            <p>Students</p>
+
+                    <!-- 3. Admission Details -->
+                    <div class="academic-card">
+                        <div class="academic-card-top">
+                            <div class="academic-number">ENROLLMENT • 03</div>
+                            <h3 class="academic-title">Admission Details</h3>
+                            <p class="academic-desc">Official KVS admission schedules, category priorities for central government employees and defense personnel, and lottery guidelines.</p>
                         </div>
-                        <div class="hero-stat">
-                            <h3>15+</h3>
-                            <p>Expert Teachers</p>
-                        </div>
-                        <div class="hero-stat">
-                            <h3>95%</h3>
-                            <p>Success Rate</p>
-                        </div>
+                        <a href="https://no1itarasi.kvs.ac.in/en/admission-details/" target="_blank" rel="noopener noreferrer" class="editorial-link">
+                            <span>Admission Portal ↗</span>
+                        </a>
                     </div>
-                </div>
-                <div class="hero-image">
-                    <img src="https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?auto=compress&cs=tinysrgb&w=600&h=500&fit=crop"
-                        alt="Students studying">
-                    <div class="hero-float-card card-1">
-                        <div class="float-icon blue"><i class="bi bi-mortarboard-fill"></i></div>
-                        <div class="float-text">
-                            <h4>Expert Faculty</h4>
-                            <p>Experienced teachers</p>
+
+                    <!-- 4. Fee Structure -->
+                    <div class="academic-card">
+                        <div class="academic-card-top">
+                            <div class="academic-number">REGULATION • 04</div>
+                            <h3 class="academic-title">Fee Structure</h3>
+                            <p class="academic-desc">Standardized KVS fee schedules including Vidyalaya Vikas Nidhi (VVN) and tuition fee guidelines payable through the official Union Bank of India portal.</p>
                         </div>
+                        <a href="https://no1itarasi.kvs.ac.in/en/" target="_blank" rel="noopener noreferrer" class="editorial-link">
+                            <span>KVS Fee Guidelines ↗</span>
+                        </a>
                     </div>
-                    <div class="hero-float-card card-2">
-                        <div class="float-icon green"><i class="bi bi-graph-up-arrow"></i></div>
-                        <div class="float-text">
-                            <h4>Results Oriented</h4>
-                            <p>Proven track record</p>
+
+                    <!-- 5. Student Achievers -->
+                    <div class="academic-card">
+                        <div class="academic-card-top">
+                            <div class="academic-number">HONOUR ROLL • 05</div>
+                            <h3 class="academic-title">Student Achievers</h3>
+                            <p class="academic-desc">Recognizing students who have earned distinctions in National Talent Search, Olympiads, CBSE District Ranks, and National Sports Meets.</p>
                         </div>
+                        <a href="https://no1itarasi.kvs.ac.in/en/" target="_blank" rel="noopener noreferrer" class="editorial-link">
+                            <span>Merit Roll ↗</span>
+                        </a>
+                    </div>
+
+                    <!-- 6. Faculty Achievers -->
+                    <div class="academic-card">
+                        <div class="academic-card-top">
+                            <div class="academic-number">LEADERSHIP • 06</div>
+                            <h3 class="academic-title">Teacher Achievers</h3>
+                            <p class="academic-desc">Honouring dedicated teachers recognized for regional innovation, innovative pedagogy, educational research, and exemplary board mentoring.</p>
+                        </div>
+                        <a href="https://no1itarasi.kvs.ac.in/en/" target="_blank" rel="noopener noreferrer" class="editorial-link">
+                            <span>Faculty Roll ↗</span>
+                        </a>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Features Section -->
-    <section class="features" id="features">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-badge">Why Choose Us</span>
-                <h2>Excellence in Every Aspect</h2>
-                <p>We provide comprehensive coaching that covers all aspects of exam preparation</p>
-            </div>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon blue"><i class="bi bi-person-workspace"></i></div>
-                    <h3>Expert Coaching</h3>
-                    <p>Learn from highly qualified and experienced teachers who are passionate about teaching.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon purple"><i class="bi bi-laptop"></i></div>
-                    <h3>Online & Offline Classes</h3>
-                    <p>Flexible learning modes - attend classes from home or at our center based on your preference.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon orange"><i class="bi bi-clipboard-check"></i></div>
-                    <h3>Regular Tests & DPPs</h3>
-                    <p>Continuous assessment through tests and Daily Practice Problems to track progress.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon green"><i class="bi bi-chat-dots"></i></div>
-                    <h3>Doubt Clearance</h3>
-                    <p>Dedicated doubt clearing sessions to ensure no concept is left unclear.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon pink"><i class="bi bi-people"></i></div>
-                    <h3>Small Batch Size</h3>
-                    <p>Limited students per batch ensuring personalized attention for everyone.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon cyan"><i class="bi bi-calendar-week"></i></div>
-                    <h3>Weekly Mentorship</h3>
-                    <p>One-on-one mentorship sessions every week to guide your preparation strategy.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Courses Section -->
-    <section class="courses" id="courses">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-badge">Our Programs</span>
-                <h2>Courses We Offer</h2>
-                <p>Comprehensive programs designed to help you excel in your academics and competitive exams</p>
-            </div>
-
-            <div class="courses-grid">
-                <div class="course-card">
-                    <div class="course-image"
-                        style="background-image: url('https://images.pexels.com/photos/5905709/pexels-photo-5905709.jpeg?auto=compress&cs=tinysrgb&w=400');">
+        <!-- F. INFRASTRUCTURE & LEARNING SPACES (DARK EDITORIAL SECTION) -->
+        <section class="editorial-section dark" id="facilities" aria-labelledby="facilitiesHeading">
+            <div class="editorial-container">
+                <div class="infrastructure-header">
+                    <div>
+                        <span class="section-tag inverse">Facilities & Learning Spaces</span>
+                        <h2 class="section-title" id="facilitiesHeading">Purpose-Built Learning Environments</h2>
                     </div>
-                    <div class="course-content">
-                        <span class="course-badge">Foundation</span>
-                        <h3>Class 6 to 10</h3>
-                        <p>Build a strong foundation with our comprehensive coaching for middle and high school
-                            students.</p>
-                        <div class="course-features">
-                            <span>CBSE</span>
-                            <span>ICSE</span>
-                            <span>State Boards</span>
-                            <span>All Subjects</span>
+                    <p class="section-lead">
+                        Modern scientific laboratories, innovation incubators, and sports fields configured to support hands-on exploration and physical vitality.
+                    </p>
+                </div>
+
+                <div class="facility-grid">
+                    <!-- Featured: Atal Tinkering Lab -->
+                    <div class="facility-card featured">
+                        <div class="facility-media">
+                            <img src="{{ url_for('static', filename='img/atl-lab.jpg') }}" alt="Atal Tinkering Lab at PM SHRI Kendriya Vidyalaya No. 1 Itarsi">
+                            <div class="facility-tag">STEM & Innovation</div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="course-card">
-                    <div class="course-image"
-                        style="background-image: url('https://images.pexels.com/photos/4145354/pexels-photo-4145354.jpeg?auto=compress&cs=tinysrgb&w=400');">
-                    </div>
-                    <div class="course-content">
-                        <span class="course-badge">Science Stream</span>
-                        <h3>Class 11 & 12</h3>
-                        <p>Specialized coaching for Science stream students preparing for boards and entrance exams.</p>
-                        <div class="course-features">
-                            <span>Physics</span>
-                            <span>Chemistry</span>
-                            <span>Maths</span>
-                            <span>Biology</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="course-card">
-                    <div class="course-image"
-                        style="background-image: url('https://images.pexels.com/photos/3825527/pexels-photo-3825527.jpeg?auto=compress&cs=tinysrgb&w=400');">
-                    </div>
-                    <div class="course-content">
-                        <span class="course-badge" style="background: #7c3aed;">JEE / NEET</span>
-                        <h3>Competitive Exams</h3>
-                        <p>Intensive preparation for engineering and medical entrance examinations.</p>
-                        <div class="course-features">
-                            <span>JEE Main</span>
-                            <span>JEE Advanced</span>
-                            <span>NEET UG</span>
-                            <span>Mock Tests</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="course-card">
-                    <div class="course-image"
-                        style="background-image: url('https://images.pexels.com/photos/7092613/pexels-photo-7092613.jpeg?auto=compress&cs=tinysrgb&w=400');">
-                    </div>
-                    <div class="course-content">
-                        <span class="course-badge" style="background: #10b981;">CUET</span>
-                        <h3>CUET Preparation</h3>
-                        <p>Complete preparation for Central University Entrance Test for undergraduate admissions.</p>
-                        <div class="course-features">
-                            <span>Language</span>
-                            <span>Domain</span>
-                            <span>General Test</span>
-                            <span>Practice</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section class="contact" id="contact">
-        <div class="container">
-            <div class="contact-grid">
-                <div class="contact-info">
-                    <h2>Get In Touch</h2>
-                    <p>Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as
-                        possible.</p>
-
-                    <div class="contact-item">
-                        <div class="contact-icon"><i class="bi bi-geo-alt-fill"></i></div>
-                        <div class="contact-text">
-                            <h4>Visit Us</h4>
-                            <p>F-3/8A, Shiv Durga Vihar, Lakkarpur,<br>Faridabad, Haryana - 121009</p>
-                        </div>
-                    </div>
-
-                    <div class="contact-item">
-                        <div class="contact-icon"><i class="bi bi-telephone-fill"></i></div>
-                        <div class="contact-text">
-                            <h4>Call Us</h4>
-                            <p>+91 93544 39969</p>
-                        </div>
-                    </div>
-
-                    <div class="contact-item">
-                        <div class="contact-icon"><i class="bi bi-envelope-fill"></i></div>
-                        <div class="contact-text">
-                            <h4>Email Us</h4>
-                            <p>isardurganand@gmail.com</p>
-                        </div>
-                    </div>
-
-                    <div class="social-links">
-                        <a href="#"><i class="bi bi-facebook"></i></a>
-                        <a href="#"><i class="bi bi-instagram"></i></a>
-                        <a href="#"><i class="bi bi-youtube"></i></a>
-                        <a href="https://wa.me/919354439969" target="_blank"><i class="bi bi-whatsapp"></i></a>
-                    </div>
-                </div>
-
-                <div class="enquiry-form">
-                    <h3>Enquiry Form</h3>
-                    <form id="enquiryForm" action="https://formspree.io/f/your-form-id" method="POST"
-                        onsubmit="sendToWhatsApp(event)">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Student Name *</label>
-                                <input type="text" name="student_name" id="student_name" required
-                                    placeholder="Enter student name">
+                        <div class="facility-body">
+                            <div>
+                                <h3 class="facility-title">Atal Tinkering Lab (ATL)</h3>
+                                <p class="facility-desc">
+                                    Established under the Atal Innovation Mission (NITI Aayog), our ATL empowers students with practical STEM skills, 3D printing, electronics, IoT sensors, and robotics to solve real-world challenges through creative engineering.
+                                </p>
                             </div>
-                            <div class="form-group">
-                                <label>Phone Number *</label>
-                                <input type="tel" name="phone" id="phone" required placeholder="10-digit number">
+                            <a href="https://no1itarasi.kvs.ac.in/en/" target="_blank" rel="noopener noreferrer" class="editorial-link inverse">
+                                <span>Official ATL Overview ↗</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Science Laboratories -->
+                    <div class="facility-card secondary">
+                        <div class="facility-body" style="justify-content: center;">
+                            <div style="font-size: 0.72rem; font-weight: 700; color: #fb923c; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.75rem;">Experimental Learning</div>
+                            <h3 class="facility-title" style="font-size: 1.45rem; line-height: 1.25;">Physics, Chemistry & Biology Laboratories</h3>
+                            <p class="facility-desc" style="margin-top: 0.75rem;">
+                                Dedicated, high-standard laboratories equipped with advanced optical instruments, chemical safety fixtures, and biological specimens to provide rigorous practical scientific grounding.
+                            </p>
+                            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;">
+                                <span style="background: rgba(255,255,255,0.06); padding: 0.3rem 0.7rem; border-radius: 4px; font-size: 0.75rem;">Physics Lab</span>
+                                <span style="background: rgba(255,255,255,0.06); padding: 0.3rem 0.7rem; border-radius: 4px; font-size: 0.75rem;">Chemistry Lab</span>
+                                <span style="background: rgba(255,255,255,0.06); padding: 0.3rem 0.7rem; border-radius: 4px; font-size: 0.75rem;">Biology Lab</span>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <label>Email Address</label>
-                            <input type="email" name="email" id="email" placeholder="your@email.com">
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Current Class *</label>
-                                <select name="class" id="class" required>
-                                    <option value="">Select Class</option>
-                                    <option value="6">Class 6</option>
-                                    <option value="7">Class 7</option>
-                                    <option value="8">Class 8</option>
-                                    <option value="9">Class 9</option>
-                                    <option value="10">Class 10</option>
-                                    <option value="11">Class 11</option>
-                                    <option value="12">Class 12</option>
-                                    <option value="dropper">Dropper</option>
-                                </select>
+                    <!-- ICT & Digital Classrooms -->
+                    <div class="facility-card tertiary">
+                        <div class="facility-body">
+                            <div>
+                                <div style="font-size: 0.72rem; font-weight: 700; color: #fb923c; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem;">Digital Knowledge</div>
+                                <h3 class="facility-title">ICT & Smart e-Classrooms</h3>
+                                <p class="facility-desc">
+                                    Equipped with high-speed internet, interactive digital whiteboards, multimedia projectors, and computer workstations supporting computer science and informatics practices.
+                                </p>
                             </div>
-                            <div class="form-group">
-                                <label>Course Interested</label>
-                                <select name="course" id="course">
-                                    <option value="">Select Course</option>
-                                    <option value="boards">Board Preparation</option>
-                                    <option value="jee">JEE</option>
-                                    <option value="neet">NEET</option>
-                                    <option value="cuet">CUET</option>
-                                </select>
+                            <div style="font-size: 0.78rem; color: #94a3b8;">High-speed connectivity & modern systems</div>
+                        </div>
+                    </div>
+
+                    <!-- Digital Language Lab -->
+                    <div class="facility-card tertiary">
+                        <div class="facility-body">
+                            <div>
+                                <div style="font-size: 0.72rem; font-weight: 700; color: #fb923c; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem;">Linguistic Skill</div>
+                                <h3 class="facility-title">Digital Language Lab</h3>
+                                <p class="facility-desc">
+                                    Software-assisted language lab dedicated to pronunciation, listening comprehension, phonetics, and spoken communication in English and Hindi.
+                                </p>
                             </div>
+                            <div style="font-size: 0.78rem; color: #94a3b8;">Interactive audio-visual audio suites</div>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <label>Message</label>
-                            <textarea name="message" id="message" rows="3"
-                                placeholder="Any specific requirements or questions?"></textarea>
+                    <!-- Library & Sports Infrastructure -->
+                    <div class="facility-card tertiary">
+                        <div class="facility-body">
+                            <div>
+                                <div style="font-size: 0.72rem; font-weight: 700; color: #fb923c; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem;">Sports & Resource</div>
+                                <h3 class="facility-title">Library & Athletic Grounds</h3>
+                                <p class="facility-desc">
+                                    Expansive multi-discipline sports playfields for football, athletics, and basketball, complemented by an open-access library holding thousands of titles and educational journals.
+                                </p>
+                            </div>
+                            <div style="font-size: 0.78rem; color: #94a3b8;">Outdoor playfields & extensive book repository</div>
                         </div>
-
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-whatsapp"></i> Send Enquiry
-                        </button>
-                    </form>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2025 PM SHRI Kendriya Vidyalaya. All rights reserved. | Shaping Futures, One Student at a Time.</p>
+        <!-- G. ACTIVITIES & INITIATIVES -->
+        <section class="editorial-section canvas" id="activities" aria-labelledby="activitiesHeading">
+            <div class="editorial-container">
+                <div>
+                    <span class="section-tag">Co-Curricular Life</span>
+                    <h2 class="section-title" id="activitiesHeading">Nurturing Character, Creativity & Leadership</h2>
+                    <p class="section-lead">
+                        Student life at the Vidyalaya extends beyond textbooks into experiential scientific research, environmental stewardship, cultural festivals, and athletic discipline.
+                    </p>
+                </div>
+
+                <div class="activities-grid">
+                    <!-- 1. STEM & NCSC -->
+                    <div class="activity-item">
+                        <div class="activity-icon-pill">
+                            <i class="bi bi-cpu"></i>
+                        </div>
+                        <h3 class="activity-title">STEM & Science Congress</h3>
+                        <p class="activity-desc">Participation in the National Children's Science Congress (NCSC), regional science exhibitions, mathematics olympiads, and annual technology showcases.</p>
+                    </div>
+
+                    <!-- 2. Bharat Scouts & Guides -->
+                    <div class="activity-item">
+                        <div class="activity-icon-pill">
+                            <i class="bi bi-compass"></i>
+                        </div>
+                        <h3 class="activity-title">Bharat Scouts & Guides</h3>
+                        <p class="activity-desc">Cultivating self-reliance, leadership, community welfare, and outdoor adventure through structured camps, jamborees, and social service drives.</p>
+                    </div>
+
+                    <!-- 3. PM SHRI Green Initiatives -->
+                    <div class="activity-item">
+                        <div class="activity-icon-pill">
+                            <i class="bi bi-flower1"></i>
+                        </div>
+                        <h3 class="activity-title">PM SHRI Eco Initiatives</h3>
+                        <p class="activity-desc">School herbal garden, tree plantation drives, Swachhata Pakhwada, energy conservation drives, and environmental audit projects.</p>
+                    </div>
+
+                    <!-- 4. Yoga & Physical Wellness -->
+                    <div class="activity-item">
+                        <div class="activity-icon-pill">
+                            <i class="bi bi-heart-pulse"></i>
+                        </div>
+                        <h3 class="activity-title">Yoga & Physical Fitness</h3>
+                        <p class="activity-desc">Daily morning assembly yoga protocols, Fit India school week celebrations, annual athletic meets, and participation in KVS National Sports Competitions.</p>
+                    </div>
+
+                    <!-- 5. Arts, Crafts & Kala Utsav -->
+                    <div class="activity-item">
+                        <div class="activity-icon-pill">
+                            <i class="bi bi-palette"></i>
+                        </div>
+                        <h3 class="activity-title">Kala Utsav & Cultural Arts</h3>
+                        <p class="activity-desc">Fostering artistic talent through visual arts, folk dance, classical music, drama, and regional heritage celebrations under the Ministry of Education.</p>
+                    </div>
+
+                    <!-- 6. Ek Bharat Shreshtha Bharat -->
+                    <div class="activity-item">
+                        <div class="activity-icon-pill">
+                            <i class="bi bi-globe-central-south-asia"></i>
+                        </div>
+                        <h3 class="activity-title">Ek Bharat Shreshtha Bharat</h3>
+                        <p class="activity-desc">Engaging in national cultural and linguistic exchange programs that celebrate India's vibrant diversity and strengthen mutual understanding.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- H. ACHIEVEMENTS & RESULTS -->
+        <section class="editorial-section muted" id="achievements" aria-labelledby="achievementsHeading">
+            <div class="editorial-container">
+                <div class="achievements-wrapper">
+                    <span class="section-tag">Performance Track Record</span>
+                    <h2 class="section-title" id="achievementsHeading">A Tradition of Distinction</h2>
+                    
+                    <div class="achievements-grid">
+                        <div class="stat-item">
+                            <div class="stat-metric accent">100%</div>
+                            <div class="stat-title">Board Pass Record</div>
+                            <div class="stat-desc">Consistent high-quality performance in CBSE Class X & XII Examinations.</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-metric">40+</div>
+                            <div class="stat-title">Years of Legacy</div>
+                            <div class="stat-desc">Four decades of continuous academic nurturing since 1980 in Itarsi.</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-metric accent">PM SHRI</div>
+                            <div class="stat-title">Exemplar Status</div>
+                            <div class="stat-desc">Chosen as a national model school for NEP 2020 transformation.</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-metric">KVS</div>
+                            <div class="stat-title">National Representation</div>
+                            <div class="stat-desc">Regular representation in KVS National Sports Meets and Science Congress.</div>
+                        </div>
+                    </div>
+
+                    <div class="achievements-footer">
+                        <p class="achievements-note">
+                            * Detailed individual marks, merit rosters, and board result analysis are maintained on the official KVS portal according to Ministry of Education guidelines.
+                        </p>
+                        <a href="https://no1itarasi.kvs.ac.in/en/" target="_blank" rel="noopener noreferrer" class="btn-editorial outline-dark">
+                            <span>View Board Result Analysis on KVS Portal</span>
+                            <i class="bi bi-arrow-up-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- I. NEWS & NOTICES -->
+        <section class="editorial-section canvas" id="notices" aria-labelledby="noticesHeading">
+            <div class="editorial-container">
+                <div class="notices-header">
+                    <div>
+                        <span class="section-tag">Institutional Communications</span>
+                        <h2 class="section-title" id="noticesHeading">Notices & Circulars</h2>
+                    </div>
+                    <a href="https://no1itarasi.kvs.ac.in/en/admission-details/" target="_blank" rel="noopener noreferrer" class="editorial-link">
+                        <span>View All Notices on Official Website</span>
+                        <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                </div>
+
+                <div class="notices-list">
+                    <!-- Notice 1: Admissions -->
+                    <a href="https://no1itarasi.kvs.ac.in/en/admission-details/" target="_blank" rel="noopener noreferrer" class="notice-card">
+                        <div class="notice-meta">
+                            <span class="notice-tag">Admissions</span>
+                            <span class="notice-date">Academic Session</span>
+                        </div>
+                        <div class="notice-content">
+                            <h3 class="notice-title">KVS Online Admission Guidelines & Schedule</h3>
+                            <p class="notice-excerpt">Official notification regarding Class I online registration timeline, priority categories for central govt./defense employees, and RTE provision lottery.</p>
+                        </div>
+                        <div class="notice-arrow">
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </a>
+
+                    <!-- Notice 2: CBSE Board Exams -->
+                    <a href="https://no1itarasi.kvs.ac.in/en/" target="_blank" rel="noopener noreferrer" class="notice-card">
+                        <div class="notice-meta">
+                            <span class="notice-tag">Examinations</span>
+                            <span class="notice-date">CBSE Circular</span>
+                        </div>
+                        <div class="notice-content">
+                            <h3 class="notice-title">CBSE Board Examination Date Sheet & Admit Card Instructions</h3>
+                            <p class="notice-excerpt">Guidelines and practical examination schedules for registered candidates appearing for Class X and Class XII Board Examinations.</p>
+                        </div>
+                        <div class="notice-arrow">
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </a>
+
+                    <!-- Notice 3: Fee Payment Notice -->
+                    <a href="https://no1itarasi.kvs.ac.in/en/" target="_blank" rel="noopener noreferrer" class="notice-card">
+                        <div class="notice-meta">
+                            <span class="notice-tag">Fee Collection</span>
+                            <span class="notice-date">Quarterly Notice</span>
+                        </div>
+                        <div class="notice-content">
+                            <h3 class="notice-title">Quarterly Vidyalaya Vikas Nidhi (VVN) & Tuition Fee Collection</h3>
+                            <p class="notice-excerpt">Information regarding online payment of quarterly school fees through the Union Bank of India (UBI) KVS online fee payment gateway.</p>
+                        </div>
+                        <div class="notice-arrow">
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </a>
+
+                    <!-- Notice 4: Atal Tinkering Lab Workshop -->
+                    <a href="https://no1itarasi.kvs.ac.in/en/" target="_blank" rel="noopener noreferrer" class="notice-card">
+                        <div class="notice-meta">
+                            <span class="notice-tag">PM SHRI Workshop</span>
+                            <span class="notice-date">Event Notice</span>
+                        </div>
+                        <div class="notice-content">
+                            <h3 class="notice-title">Atal Tinkering Lab Robotics & Hands-On Science Workshop</h3>
+                            <p class="notice-excerpt">Hands-on innovation session organized under the PM SHRI scheme for secondary school students showcasing sensor robotics and 3D design prototypes.</p>
+                        </div>
+                        <div class="notice-arrow">
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- J. CONTACT & LOCATION -->
+        <section class="editorial-section muted" id="contact" aria-labelledby="contactHeading">
+            <div class="editorial-container">
+                <div class="contact-grid">
+                    <div class="contact-details">
+                        <div>
+                            <span class="section-tag">Campus Location</span>
+                            <h2 class="section-title" id="contactHeading">Visit & Connect</h2>
+                            <p class="section-lead">
+                                Located within the secure, green residential perimeter of the Ordnance Factory Estate in Itarsi, Madhya Pradesh.
+                            </p>
+                        </div>
+
+                        <div class="contact-block">
+                            <div class="contact-label">Postal Address</div>
+                            <div class="contact-value">
+                                PM SHRI Kendriya Vidyalaya No. 1<br>
+                                Ordnance Factory Estate, Itarsi<br>
+                                District Narmadapuram, Madhya Pradesh – 461122
+                            </div>
+                            <div class="contact-sub">Approx. 13 km from Itarsi Junction Railway Station</div>
+                        </div>
+
+                        <div class="contact-block">
+                            <div class="contact-label">Institutional Affiliation</div>
+                            <div class="contact-value">Kendriya Vidyalaya Sangathan (Bhopal Region)</div>
+                            <div class="contact-sub">Under the Ministry of Education, Government of India</div>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                            <a href="https://maps.app.goo.gl/BmCqfzU9GJMbsGBh6" target="_blank" rel="noopener noreferrer" class="btn-editorial primary">
+                                <i class="bi bi-geo-alt-fill"></i>
+                                <span>Open in Google Maps</span>
+                            </a>
+                            <a href="https://no1itarasi.kvs.ac.in/en/contact-us/" target="_blank" rel="noopener noreferrer" class="btn-editorial outline-dark">
+                                <span>Official Contact Page ↗</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Clean Map Display -->
+                    <div class="map-card">
+                        <div class="map-frame-wrapper">
+                            <iframe 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14742.662057398337!2d77.7288!3d22.6108!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x397dc957c5a932d5%3A0xe5479cb2ea11306c!2sPM%20SHRI%20Kendriya%20Vidyalaya%20No.%201%20Ordnance%20Factory%20Itarsi!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" 
+                                title="Location of PM SHRI Kendriya Vidyalaya No. 1 Itarsi on Google Maps"
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+                        <div class="map-card-footer">
+                            <span style="font-size: 0.8rem; color: var(--color-text-muted);">
+                                <i class="bi bi-shield-check" style="color: #15803d; margin-right: 4px;"></i>
+                                Verified Google Maps Coordinates
+                            </span>
+                            <a href="https://maps.app.goo.gl/BmCqfzU9GJMbsGBh6" target="_blank" rel="noopener noreferrer" class="editorial-link" style="font-size: 0.8rem;">
+                                <span>Full Map View</span>
+                                <i class="bi bi-box-arrow-up-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- K. MINIMAL DARK EDITORIAL FOOTER -->
+    <footer class="site-footer">
+        <div class="editorial-container">
+            <div class="footer-grid">
+                <!-- Column 1: School Identity -->
+                <div class="footer-brand">
+                    <div class="footer-school-name">PM SHRI Kendriya Vidyalaya No. 1, Itarsi</div>
+                    <p class="footer-identity-text">
+                        An autonomous institution under the Ministry of Education, Government of India. Affiliated to the Central Board of Secondary Education (CBSE), New Delhi. Dedicated to academic excellence, character building, and national integration since 1980.
+                    </p>
+                    <div style="margin-top: 0.5rem;">
+                        <a href="{{ url_for('auth.login') }}" class="btn-editorial primary" style="padding: 0.5rem 1.25rem; font-size: 0.8rem;">
+                            <i class="bi bi-lock-fill"></i>
+                            <span>Administrative & Student Login</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Column 2: Navigation -->
+                <div>
+                    <div class="footer-col-title">Vidyalaya</div>
+                    <ul class="footer-links">
+                        <li><a href="#about" class="footer-link">About the Vidyalaya</a></li>
+                        <li><a href="#academics" class="footer-link">Academic Overview</a></li>
+                        <li><a href="#facilities" class="footer-link">Infrastructure & ATL</a></li>
+                        <li><a href="#activities" class="footer-link">Activities & Initiatives</a></li>
+                        <li><a href="#achievements" class="footer-link">Achievements & Results</a></li>
+                        <li><a href="#notices" class="footer-link">Notices & Circulars</a></li>
+                        <li><a href="#contact" class="footer-link">Location & Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Government Portals -->
+                <div>
+                    <div class="footer-col-title">Government Links</div>
+                    <ul class="footer-links">
+                        <li><a href="https://no1itarasi.kvs.ac.in/en/" target="_blank" rel="noopener noreferrer" class="footer-link">School Official Website ↗</a></li>
+                        <li><a href="https://kvsangathan.nic.in" target="_blank" rel="noopener noreferrer" class="footer-link">KVS Headquarters (New Delhi) ↗</a></li>
+                        <li><a href="https://roregionalbhopal.kvs.ac.in" target="_blank" rel="noopener noreferrer" class="footer-link">KVS Regional Office Bhopal ↗</a></li>
+                        <li><a href="https://www.education.gov.in" target="_blank" rel="noopener noreferrer" class="footer-link">Ministry of Education ↗</a></li>
+                        <li><a href="https://www.cbse.gov.in" target="_blank" rel="noopener noreferrer" class="footer-link">CBSE Official Website ↗</a></li>
+                        <li><a href="https://pmshrischools.education.gov.in" target="_blank" rel="noopener noreferrer" class="footer-link">PM SHRI Portal ↗</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 4: Key Verification Codes -->
+                <div>
+                    <div class="footer-col-title">Institutional Codes</div>
+                    <ul class="footer-links">
+                        <li style="color: #cbd5e1; font-size: 0.82rem;"><strong>KV Code:</strong> 1113</li>
+                        <li style="color: #cbd5e1; font-size: 0.82rem;"><strong>CBSE Affiliation:</strong> 1000015</li>
+                        <li style="color: #cbd5e1; font-size: 0.82rem;"><strong>CBSE School Code:</strong> 54087</li>
+                        <li style="color: #cbd5e1; font-size: 0.82rem;"><strong>UDISE Code:</strong> 23370406306</li>
+                        <li style="color: #cbd5e1; font-size: 0.82rem;"><strong>Established:</strong> 1980</li>
+                        <li style="color: #cbd5e1; font-size: 0.82rem;"><strong>Pin Code:</strong> 461122</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div>
+                    © 2026 PM SHRI Kendriya Vidyalaya No. 1, Ordnance Factory, Itarsi. All rights reserved.
+                </div>
+                <div class="footer-codes">
+                    <span>Ordnance Factory Estate, Itarsi, Madhya Pradesh</span>
+                    <a href="#top" style="color: #e2e8f0;"><i class="bi bi-chevron-up"></i> Back to Top</a>
+                </div>
+            </div>
         </div>
     </footer>
 
+    <!-- Minimal Vanilla JavaScript for Navigation & Interactions -->
     <script>
-        // WhatsApp Integration
-        function sendToWhatsApp(e) {
-            e.preventDefault();
+        document.addEventListener('DOMContentLoaded', () => {
+            const navbar = document.getElementById('siteNav');
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            const mobileDrawer = document.getElementById('mobileDrawer');
+            const mobileLinks = document.querySelectorAll('.mobile-nav-link');
+            const desktopLinks = document.querySelectorAll('.nav-links .nav-link');
 
-            // Get form values
-            const name = document.getElementById('student_name').value;
-            const phone = document.getElementById('phone').value;
-            const email = document.getElementById('email').value;
-            const className = document.getElementById('class').value;
-            const course = document.getElementById('course').value;
-            const message = document.getElementById('message').value;
-
-            // Construct message
-            const text = `*New Enquiry for PM SHRI Kendriya Vidyalaya*%0A` +
-                `------------------------%0A` +
-                `*Name:* ${name}%0A` +
-                `*Phone:* ${phone}%0A` +
-                `*Email:* ${email}%0A` +
-                `*Class:* ${className}%0A` +
-                `*Course:* ${course}%0A` +
-                `------------------------%0A` +
-                `*Message:* ${message}`;
-
-            // Open WhatsApp in new tab
-            const whatsappUrl = `https://wa.me/919354439969?text=${text}`;
-            window.open(whatsappUrl, '_blank');
-
-            // Submit form to Formspree (optional)
-            // Uncomment the line below if you have set up a valid Formspree ID
-            // e.target.submit();
-
-            // If Formspree is not set up, show alert
-            // alert('Enquiry sent to WhatsApp!');
-        }
-
-        // Navbar scroll effect
-        window.addEventListener('scroll', function () {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // Smooth scrolling
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+            // Sticky Navbar scroll shadow
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 40) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
                 }
-            });
+            }, { passive: true });
+
+            // Mobile menu toggle
+            if (mobileBtn && mobileDrawer) {
+                mobileBtn.addEventListener('click', () => {
+                    const isOpen = mobileDrawer.classList.toggle('open');
+                    mobileBtn.setAttribute('aria-expanded', isOpen);
+                    mobileBtn.innerHTML = isOpen ? '<i class="bi bi-x-lg" style="font-size: 1.35rem;"></i>' : '<i class="bi bi-list" style="font-size: 1.35rem;"></i>';
+                });
+
+                mobileLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        mobileDrawer.classList.remove('open');
+                        mobileBtn.setAttribute('aria-expanded', 'false');
+                        mobileBtn.innerHTML = '<i class="bi bi-list" style="font-size: 1.35rem;"></i>';
+                    });
+                });
+            }
+
+            // Active section indicator on scroll
+            const sections = document.querySelectorAll('section[id]');
+            window.addEventListener('scroll', () => {
+                let current = '';
+                const scrollPos = window.pageYOffset + 120;
+
+                sections.forEach(section => {
+                    const top = section.offsetTop;
+                    const height = section.offsetHeight;
+                    if (scrollPos >= top && scrollPos < top + height) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                desktopLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }, { passive: true });
         });
     </script>
 </body>
-
 </html>
