@@ -1,130 +1,167 @@
 {% extends "base.html" %}
 
-{% block title %}Fee Dashboard - PM SHRI Kendriya Vidyalaya{% endblock %}
-{% block page_title %}Fee Management<small>Session {{ current_session }} tracking and collections</small>{% endblock %}
+{% block title %}Fee Overview & Collections - Fee Management System{% endblock %}
+{% block page_title %}Fee Management<small>Session {{ current_session }} Collections & Ledger</small>{% endblock %}
 
 {% block content %}
-<!-- Stats -->
+<!-- Financial KPI Metric Cards (Real Database Metrics) -->
 <div class="stat-cards">
     <div class="stat-card">
         <div class="stat-icon success"><i class="bi bi-cash-stack"></i></div>
         <div class="stat-info">
+            <p>Today's Collections</p>
             <h3>₹{{ "{:,.2f}".format(today_collection) }}</h3>
-            <p>Today's Collection</p>
+            <small class="text-muted">Cleared receipts today</small>
         </div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon primary"><i class="bi bi-calendar-range"></i></div>
+        <div class="stat-icon primary"><i class="bi bi-calendar3"></i></div>
         <div class="stat-info">
-            <h3>₹{{ "{:,.2f}".format(monthly_collection) }}</h3>
             <p>This Month</p>
+            <h3>₹{{ "{:,.2f}".format(monthly_collection) }}</h3>
+            <small class="text-muted">Current billing period</small>
         </div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon warning"><i class="bi bi-mortarboard"></i></div>
+        <div class="stat-icon primary"><i class="bi bi-bank"></i></div>
         <div class="stat-info">
+            <p>Session Collection</p>
             <h3>₹{{ "{:,.2f}".format(session_collection) }}</h3>
-            <p>Session ({{ current_session }})</p>
+            <small class="text-muted">Academic session {{ current_session }}</small>
         </div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon danger"><i class="bi bi-exclamation-triangle"></i></div>
+        <div class="stat-icon {{ 'danger' if total_pending > 0 else 'success' }}">
+            <i class="bi bi-{% if total_pending > 0 %}exclamation-octagon{% else %}check-circle{% endif %}"></i>
+        </div>
         <div class="stat-info">
-            <h3>₹{{ "{:,.2f}".format(total_pending) }}</h3>
-            <p>Total Outstanding Dues</p>
+            <p>Outstanding Dues</p>
+            <h3 class="{{ 'text-danger' if total_pending > 0 else 'text-success' }}">₹{{ "{:,.2f}".format(total_pending) }}</h3>
             {% if overdue_count > 0 %}
-            <small style="color: #ef4444; font-weight: 600;">{{ overdue_count }} overdue items</small>
+            <small class="text-danger" style="font-weight: 600;">
+                <i class="bi bi-clock-history"></i> {{ overdue_count }} overdue payment items
+            </small>
+            {% else %}
+            <small class="text-success">All dues within schedule</small>
             {% endif %}
         </div>
     </div>
 </div>
 
-<!-- Quick Actions -->
-<div class="card" style="margin-bottom: 20px;">
+<!-- Fee Administration Quick Actions Toolbar -->
+<div class="card">
     <div class="card-header">
-        <h3 class="card-title"><i class="bi bi-lightning-fill" style="color: var(--accent);"></i> Quick Actions</h3>
+        <h3 class="card-title">
+            <i class="bi bi-lightning-charge"></i>
+            <span>Fee Administration Quick Actions</span>
+        </h3>
     </div>
-    <div class="card-body">
-        <div class="quick-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
+    <div class="card-body" style="padding: 14px 20px;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="{{ url_for('fee.collect_fee') }}" class="btn btn-primary">
-                <i class="bi bi-cash"></i> Collect Fee
+                <i class="bi bi-plus-circle"></i> Collect Fee Payment
             </a>
-            <a href="{{ url_for('fee.pending_fees') }}" class="btn btn-warning">
-                <i class="bi bi-hourglass-split"></i> Pending Fees
+            <a href="{{ url_for('fee.pending_fees') }}" class="btn btn-outline">
+                <i class="bi bi-hourglass-split"></i> Review Pending Dues
             </a>
-            <a href="{{ url_for('fee.defaulters') }}" class="btn btn-outline" style="color: var(--danger); border-color: var(--danger);">
-                <i class="bi bi-alarm"></i> Defaulters
+            <a href="{{ url_for('fee.defaulters') }}" class="btn btn-outline-danger">
+                <i class="bi bi-exclamation-triangle"></i> Overdue Defaulters ({{ overdue_count }})
             </a>
             <a href="{{ url_for('fee.list_transactions') }}" class="btn btn-outline">
-                <i class="bi bi-list-ul"></i> All Transactions
+                <i class="bi bi-receipt-cutoff"></i> All Transactions
             </a>
             <a href="{{ url_for('fee.list_structures') }}" class="btn btn-outline hide-mobile">
-                <i class="bi bi-gear"></i> Fee Configurations
+                <i class="bi bi-sliders2"></i> Fee Configurations
             </a>
             <a href="{{ url_for('fee.fee_report') }}" class="btn btn-outline hide-mobile">
-                <i class="bi bi-graph-up"></i> Reports & Analytics
+                <i class="bi bi-file-earmark-bar-graph"></i> Financial Reports
             </a>
         </div>
     </div>
 </div>
 
-<!-- Recent Transactions -->
+<!-- Recent Transactions Ledger Table -->
 <div class="card">
-    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-        <h3 class="card-title" style="margin: 0;">Recent Transactions</h3>
-        <a href="{{ url_for('fee.list_transactions') }}" class="btn btn-sm btn-outline">View All</a>
+    <div class="card-header">
+        <div class="d-flex align-items-center gap-2">
+            <h3 class="card-title">
+                <i class="bi bi-journal-text"></i>
+                <span>Recent Payment Transactions</span>
+            </h3>
+            <span class="badge badge-secondary" style="font-size: 11px;">Latest 10</span>
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <a href="{{ url_for('fee.list_transactions') }}" class="btn btn-sm btn-outline">
+                <span>View Full Ledger</span>
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
     </div>
     <div class="card-body" style="padding: 0;">
         {% if recent_transactions %}
         <div class="table-responsive">
-            <table class="table">
+            <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Receipt #</th>
-                        <th>Student</th>
-                        <th>Session / Quarter</th>
-                        <th>Component</th>
-                        <th>Amount</th>
-                        <th class="hide-mobile">Mode</th>
-                        <th class="hide-mobile">Date</th>
+                        <th style="width: 140px;">Receipt #</th>
+                        <th>Student Name & ID</th>
+                        <th>Session / Period</th>
+                        <th>Fee Head</th>
+                        <th class="text-right">Amount</th>
+                        <th class="hide-mobile">Payment Mode</th>
+                        <th class="hide-mobile">Payment Date</th>
                         <th>Status</th>
-                        <th>Action</th>
+                        <th style="width: 80px; text-align: center;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for txn in recent_transactions %}
-                    <tr style="{{ 'opacity: 0.6; text-decoration: line-through;' if txn.status == 'REVERSED' else '' }}">
+                    <tr style="{{ 'opacity: 0.65; background-color: var(--bg-subtle);' if txn.status == 'REVERSED' else '' }}">
                         <td>
-                            <a href="{{ url_for('fee.view_receipt', id=txn.id) }}">
-                                <strong>{{ txn.receipt_number }}</strong>
+                            <a href="{{ url_for('fee.view_receipt', id=txn.id) }}" style="font-weight: 600; font-family: var(--font-mono);">
+                                {{ txn.receipt_number }}
                             </a>
                         </td>
                         <td>
-                            <a href="{{ url_for('student.view_student', id=txn.student_id) }}">
-                                {{ txn.student.full_name if txn.student else 'N/A' }}
+                            {% if txn.student %}
+                            <a href="{{ url_for('student.view_student', id=txn.student_id) }}" style="font-weight: 600; color: var(--text-primary);">
+                                {{ txn.student.full_name }}
                             </a>
-                            <br><small class="text-muted">{{ txn.student.student_id if txn.student else '' }}</small>
-                        </td>
-                        <td>
-                            {{ txn.academic_session or '-' }}
-                            {% if txn.quarter %}
-                            <span class="badge badge-secondary" style="font-size: 11px;">{{ txn.quarter }}</span>
+                            <div style="font-size: 11px; color: var(--text-muted);">
+                                ID: {{ txn.student.student_id }} &bull; {{ txn.student.batch.name if txn.student.batch else 'No Class' }}
+                            </div>
+                            {% else %}
+                            <span class="text-muted">N/A</span>
                             {% endif %}
                         </td>
-                        <td>{{ txn.fee_component or 'Fee' }}</td>
-                        <td class="{{ 'text-success' if txn.status != 'REVERSED' else 'text-muted' }}">
-                            <strong>₹{{ "{:,.2f}".format(txn.amount) }}</strong>
+                        <td>
+                            <span>{{ txn.academic_session or '-' }}</span>
+                            {% if txn.quarter %}
+                            <span class="badge badge-secondary" style="font-size: 10px; margin-left: 4px;">{{ txn.quarter }}</span>
+                            {% endif %}
                         </td>
-                        <td class="hide-mobile"><span class="badge badge-secondary">{{ txn.payment_mode }}</span></td>
-                        <td class="hide-mobile">{{ txn.payment_date.strftime('%d %b') }}</td>
+                        <td>{{ txn.fee_component or 'General Fee' }}</td>
+                        <td class="text-right">
+                            <span class="currency-val {{ 'text-success' if txn.status != 'REVERSED' else 'text-muted' }}">
+                                ₹{{ "{:,.2f}".format(txn.amount) }}
+                            </span>
+                        </td>
+                        <td class="hide-mobile">
+                            <span class="badge badge-secondary">{{ txn.payment_mode.replace('_', ' ') if txn.payment_mode else 'CASH' }}</span>
+                        </td>
+                        <td class="hide-mobile" style="color: var(--text-secondary); font-size: 12px;">
+                            {{ txn.payment_date.strftime('%d-%b-%Y') if txn.payment_date else '-' }}
+                        </td>
                         <td>
                             <span class="badge {{ 'badge-success' if txn.status != 'REVERSED' else 'badge-danger' }}">
+                                <i class="bi bi-{{ 'check-circle' if txn.status != 'REVERSED' else 'slash-circle' }}"></i>
                                 {{ txn.status }}
                             </span>
                         </td>
-                        <td>
-                            <a href="{{ url_for('fee.view_receipt', id=txn.id) }}" class="btn btn-sm btn-outline" title="View Receipt">
+                        <td style="text-align: center;">
+                            <a href="{{ url_for('fee.view_receipt', id=txn.id) }}" class="btn btn-sm btn-outline" title="View Official Receipt">
                                 <i class="bi bi-receipt"></i>
+                                <span>Receipt</span>
                             </a>
                         </td>
                     </tr>
@@ -134,10 +171,12 @@
         </div>
         {% else %}
         <div class="empty-state">
-            <i class="bi bi-receipt"></i>
-            <h3>No Transactions Yet</h3>
-            <p>Start collecting fees to see transactions here.</p>
-            <a href="{{ url_for('fee.collect_fee') }}" class="btn btn-primary">Collect Fee</a>
+            <i class="bi bi-receipt-cutoff"></i>
+            <h3>No Fee Transactions Recorded</h3>
+            <p>No fee payments have been logged yet for this academic session.</p>
+            <a href="{{ url_for('fee.collect_fee') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Collect First Fee
+            </a>
         </div>
         {% endif %}
     </div>

@@ -3,247 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Receipt #{{ transaction.receipt_number }} - {{ school_name }}</title>
+    <title>Official Receipt #{{ transaction.receipt_number }} - {{ school_name }}</title>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
         body {
             background: #ffffff;
-            color: #111827;
-            padding: 20px;
+            color: #0f172a;
+            padding: 24px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .print-toolbar {
+            max-width: 760px;
+            margin: 0 auto 16px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-print {
+            background: #0f172a;
+            color: #ffffff;
+            border: 1px solid #0f172a;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-print:hover {
+            background: #1e293b;
         }
         .print-container {
-            max-width: 800px;
+            max-width: 760px;
             margin: 0 auto;
-            border: 2px solid #1e3a8a;
-            padding: 30px;
-            border-radius: 8px;
+            border: 1.5px solid #0f172a;
+            padding: 28px;
+            background: #ffffff;
         }
         .header {
             text-align: center;
-            border-bottom: 2px solid #1e3a8a;
-            padding-bottom: 16px;
-            margin-bottom: 20px;
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 12px;
+            margin-bottom: 18px;
         }
         .header h1 {
-            color: #1e3a8a;
-            font-size: 26px;
-            margin-bottom: 4px;
+            color: #0f172a;
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
         }
         .header p {
-            font-size: 13px;
-            color: #4b5563;
+            font-size: 12px;
+            color: #334155;
             margin: 2px 0;
         }
         .receipt-badge {
             display: inline-block;
-            background: #10b981;
+            background: #0f172a;
             color: #ffffff;
-            padding: 4px 16px;
-            border-radius: 4px;
-            font-size: 14px;
+            padding: 3px 12px;
+            border-radius: 2px;
+            font-size: 11px;
             font-weight: bold;
-            margin-top: 10px;
+            margin-top: 6px;
             text-transform: uppercase;
+            letter-spacing: 0.8px;
         }
         .receipt-badge.reversed {
-            background: #ef4444;
+            background: #dc2626;
         }
         .meta-table {
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             border-collapse: collapse;
-            font-size: 14px;
+            font-size: 12.5px;
         }
         .meta-table td {
-            padding: 6px 10px;
+            padding: 4px 6px;
             vertical-align: top;
         }
         .meta-table td.label {
-            color: #6b7280;
-            width: 25%;
+            color: #475569;
+            width: 22%;
         }
         .meta-table td.val {
             font-weight: 600;
-            width: 25%;
+            color: #0f172a;
+            width: 28%;
         }
         .items-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
-            font-size: 14px;
+            margin-bottom: 18px;
+            font-size: 12.5px;
         }
         .items-table th, .items-table td {
-            border: 1px solid #d1d5db;
-            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            padding: 7px 10px;
         }
         .items-table th {
-            background: #f3f4f6;
+            background: #f1f5f9;
             text-align: left;
             font-weight: 600;
-            color: #374151;
+            color: #0f172a;
+            font-size: 11.5px;
+            text-transform: uppercase;
         }
         .text-right {
             text-align: right;
         }
         .totals-section {
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            padding: 16px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 14px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            font-size: 12.5px;
         }
         .totals-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 6px;
+            padding: 3px 0;
         }
-        .totals-row.grand {
-            font-size: 17px;
-            font-weight: bold;
-            color: #059669;
-            border-top: 2px solid #d1d5db;
+        .totals-row.final {
+            border-top: 1px solid #cbd5e1;
+            margin-top: 6px;
+            padding-top: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .amount-words-box {
+            font-size: 12px;
+            font-style: italic;
+            border-top: 1px dashed #cbd5e1;
             padding-top: 8px;
             margin-top: 8px;
         }
-        .totals-row.balance {
-            font-size: 14px;
-            font-weight: bold;
-            color: #dc2626;
-            border-top: 1px dashed #d1d5db;
-            padding-top: 6px;
-            margin-top: 6px;
-        }
-        .words-box {
-            font-style: italic;
-            font-size: 13px;
-            color: #4b5563;
-            margin-top: 8px;
-            border-top: 1px dashed #d1d5db;
-            padding-top: 6px;
-        }
-        .footer-signatures {
+        .signatures {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
-            margin-top: 50px;
+            margin-top: 40px;
             padding-top: 10px;
-            font-size: 13px;
-            color: #4b5563;
+            font-size: 12px;
         }
-        .sig-line {
-            border-top: 1px solid #9ca3af;
-            width: 200px;
+        .sig-block {
             text-align: center;
+            width: 180px;
+            border-top: 1px solid #64748b;
             padding-top: 4px;
+            color: #334155;
         }
-        .print-btn-bar {
+        .audit-footer {
+            margin-top: 24px;
             text-align: center;
-            margin-bottom: 20px;
-        }
-        .btn {
-            background: #1e3a8a;
-            color: #ffffff;
-            padding: 8px 20px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
-            margin-right: 10px;
+            font-size: 10px;
+            color: #64748b;
+            border-top: 1px dashed #cbd5e1;
+            padding-top: 8px;
         }
         @media print {
-            .print-btn-bar {
-                display: none !important;
-            }
             body {
                 padding: 0;
             }
+            .print-toolbar {
+                display: none !important;
+            }
             .print-container {
-                border: 1px solid #111827;
+                border: 1px solid #000000;
                 padding: 20px;
+                max-width: 100%;
+                width: 100%;
+            }
+            .header {
+                border-bottom: 2px solid #000000;
+            }
+            .items-table th, .items-table td {
+                border: 1px solid #000000;
+            }
+            .receipt-badge {
+                border: 1px solid #000000;
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+            .totals-section {
+                border: 1px solid #000000;
+                background: #ffffff !important;
             }
         }
     </style>
 </head>
 <body>
-    <div class="print-btn-bar">
-        <button class="btn" onclick="window.print()">Print Receipt</button>
-        <button class="btn" style="background: #4b5563;" onclick="window.close()">Close Window</button>
+    <div class="print-toolbar">
+        <a href="{{ url_for('fee.view_receipt', id=transaction.id) }}" style="color: #0f172a; text-decoration: none; font-size: 13px; font-weight: 500;">
+            &larr; Back to System Receipt
+        </a>
+        <button type="button" class="btn-print" onclick="window.print()">
+            Print Receipt
+        </button>
     </div>
 
     <div class="print-container">
+        {% if transaction.status == 'REVERSED' %}
+        <div style="background: #fef2f2; border: 1px solid #ef4444; color: #991b1b; padding: 10px; text-align: center; font-weight: bold; margin-bottom: 16px;">
+            OFFICIALLY REVERSED TRANSACTION - VOID
+            {% if transaction.reversal_reason %}
+            <div style="font-weight: normal; font-size: 11px; margin-top: 2px;">
+                Reason: {{ transaction.reversal_reason }}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
         <div class="header">
             <h1>{{ school_name }}</h1>
-            <p>{{ school_tagline }}</p>
-            <p>{{ school_address }} | Phone: {{ school_phone }} | Email: {{ school_email }}</p>
-            <p>Affiliation: {{ school_affiliation }}</p>
+            <p style="font-weight: 600;">{{ school_tagline }}</p>
+            <p>{{ school_address }} &bull; Phone: {{ school_phone }} &bull; Email: {{ school_email }}</p>
+            <p style="font-size: 11px;">Affiliation: {{ school_affiliation }}</p>
             <div class="receipt-badge {{ 'reversed' if transaction.status == 'REVERSED' else '' }}">
-                {{ 'FEE RECEIPT' if transaction.status != 'REVERSED' else 'REVERSED RECEIPT' }}
+                Official Fee Receipt / Payment Voucher
             </div>
         </div>
 
         <table class="meta-table">
-            <tr>
-                <td class="label">Receipt No:</td>
-                <td class="val">{{ transaction.receipt_number }}</td>
-                <td class="label">Date:</td>
-                <td class="val">{{ transaction.payment_date.strftime('%d-%m-%Y') }}</td>
-            </tr>
-            <tr>
-                <td class="label">Student Name:</td>
-                <td class="val">{{ student.full_name if student else 'N/A' }}</td>
-                <td class="label">Student ID:</td>
-                <td class="val">{{ student.student_id if student else 'N/A' }}</td>
-            </tr>
-            <tr>
-                <td class="label">Class / Batch:</td>
-                <td class="val">{{ batch.name if batch else 'N/A' }}</td>
-                <td class="label">Parent / Guardian:</td>
-                <td class="val">{{ student.parent_name if student and student.parent_name else 'N/A' }}</td>
-            </tr>
-            <tr>
-                <td class="label">Academic Session:</td>
-                <td class="val">{{ transaction.academic_session or 'N/A' }}</td>
-                <td class="label">Quarter:</td>
-                <td class="val">{{ transaction.quarter or 'N/A' }}</td>
-            </tr>
-            <tr>
-                <td class="label">Payment Mode:</td>
-                <td class="val">{{ transaction.payment_mode.replace('_', ' ').title() }}</td>
-                <td class="label">{{ 'Cheque No:' if transaction.payment_mode == 'CHEQUE' else 'Reference ID:' }}</td>
-                <td class="val">{{ transaction.cheque_number or transaction.transaction_id or 'N/A' }}</td>
-            </tr>
+            <tbody>
+                <tr>
+                    <td class="label">Receipt Number:</td>
+                    <td class="val">{{ transaction.receipt_number }}</td>
+                    <td class="label">Student Full Name:</td>
+                    <td class="val">{{ transaction.student.full_name if transaction.student else 'N/A' }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Payment Date:</td>
+                    <td class="val">{{ transaction.payment_date.strftime('%d-%b-%Y') if transaction.payment_date else '-' }}</td>
+                    <td class="label">Student ID:</td>
+                    <td class="val">{{ transaction.student.student_id if transaction.student else 'N/A' }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Academic Session:</td>
+                    <td class="val">{{ transaction.academic_session or '-' }}</td>
+                    <td class="label">Class / Batch:</td>
+                    <td class="val">{{ transaction.student.batch.name if transaction.student and transaction.student.batch else '-' }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Fee Period:</td>
+                    <td class="val">{{ transaction.quarter or 'General' }}</td>
+                    <td class="label">Guardian Name:</td>
+                    <td class="val">{{ transaction.student.parent_name if transaction.student else '-' }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Payment Mode:</td>
+                    <td class="val">{{ transaction.payment_mode.replace('_', ' ') if transaction.payment_mode else 'CASH' }}</td>
+                    <td class="label">Parent Phone:</td>
+                    <td class="val">{{ transaction.student.parent_phone if transaction.student else '-' }}</td>
+                </tr>
+                {% if transaction.payment_mode == 'CHEQUE' %}
+                <tr>
+                    <td class="label">Cheque Details:</td>
+                    <td class="val" colspan="3">
+                        Cheque #{{ transaction.cheque_number or '-' }} &bull; Date: {{ transaction.cheque_date.strftime('%d-%m-%Y') if transaction.cheque_date else '-' }} &bull; Bank: {{ transaction.bank_name or '-' }}
+                    </td>
+                </tr>
+                {% elif transaction.transaction_id %}
+                <tr>
+                    <td class="label">Reference ID:</td>
+                    <td class="val" colspan="3">{{ transaction.transaction_id }}</td>
+                </tr>
+                {% endif %}
+            </tbody>
         </table>
 
         <table class="items-table">
             <thead>
                 <tr>
-                    <th>Fee Component</th>
-                    <th>Quarter</th>
+                    <th style="width: 35px; text-align: center;">#</th>
+                    <th>Fee Component / Head</th>
+                    <th>Billing Quarter</th>
                     <th>Session</th>
-                    <th class="text-right">Allocated Amount</th>
+                    <th class="text-right" style="width: 120px;">Amount Paid (₹)</th>
                 </tr>
             </thead>
             <tbody>
-                {% if allocations and allocations|length > 0 %}
-                    {% for alloc in allocations %}
+                {% if transaction.allocations %}
+                    {% for alloc in transaction.allocations %}
                     <tr>
+                        <td style="text-align: center;">{{ loop.index }}</td>
                         <td><strong>{{ alloc.due.fee_component if alloc.due else transaction.fee_component }}</strong></td>
-                        <td>{{ alloc.due.quarter if alloc.due else transaction.quarter }}</td>
+                        <td>{{ alloc.due.quarter if alloc.due else transaction.quarter or 'General' }}</td>
                         <td>{{ alloc.due.academic_session if alloc.due else transaction.academic_session }}</td>
                         <td class="text-right">₹{{ "{:,.2f}".format(alloc.amount) }}</td>
                     </tr>
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td><strong>{{ transaction.fee_component or 'Fee Payment' }}</strong></td>
-                        <td>{{ transaction.quarter or 'N/A' }}</td>
-                        <td>{{ transaction.academic_session or 'N/A' }}</td>
+                        <td style="text-align: center;">1</td>
+                        <td><strong>{{ transaction.fee_component or 'Tuition Fee' }}</strong></td>
+                        <td>{{ transaction.quarter or 'General' }}</td>
+                        <td>{{ transaction.academic_session or '-' }}</td>
                         <td class="text-right">₹{{ "{:,.2f}".format(transaction.amount) }}</td>
                     </tr>
                 {% endif %}
@@ -252,48 +314,52 @@
 
         <div class="totals-section">
             <div class="totals-row">
-                <span>Previous Balance:</span>
+                <span>Previous Outstanding Balance:</span>
                 <span>₹{{ "{:,.2f}".format(previous_balance) }}</span>
             </div>
             {% if transaction.discount and transaction.discount > 0 %}
-            <div class="totals-row" style="color: #059669;">
-                <span>Discount / Approved Adjustment:</span>
+            <div class="totals-row">
+                <span>Concession / Adjustment:</span>
                 <span>-₹{{ "{:,.2f}".format(transaction.discount) }}</span>
             </div>
             {% endif %}
             {% if transaction.fine and transaction.fine > 0 %}
-            <div class="totals-row" style="color: #dc2626;">
-                <span>Fine / Late Fee:</span>
+            <div class="totals-row">
+                <span>Late Fee Charge:</span>
                 <span>+₹{{ "{:,.2f}".format(transaction.fine) }}</span>
             </div>
             {% endif %}
-            <div class="totals-row grand">
-                <span>Amount Paid:</span>
+            <div class="totals-row final">
+                <span>Total Amount Paid:</span>
                 <span>₹{{ "{:,.2f}".format(transaction.amount) }}</span>
             </div>
-            <div class="totals-row balance">
-                <span>Remaining Outstanding Balance:</span>
+            <div class="totals-row" style="margin-top: 4px; font-weight: 600;">
+                <span>Balance Remaining on Record:</span>
                 <span>₹{{ "{:,.2f}".format(remaining_balance) }}</span>
             </div>
-            <div class="words-box">
+            <div class="amount-words-box">
                 <strong>Amount in Words:</strong> {{ amount_in_words }}
             </div>
         </div>
 
         {% if transaction.description %}
-        <p style="font-size: 13px; color: #4b5563; margin-bottom: 20px;">
+        <div style="font-size: 11px; color: #475569; margin-bottom: 16px;">
             <strong>Remarks:</strong> {{ transaction.description }}
-        </p>
+        </div>
         {% endif %}
 
-        <div class="footer-signatures">
-            <div>
-                <div>Collector: <strong>{{ transaction.collector.username if transaction.collector else 'Office Cashier' }}</strong></div>
-                <div style="font-size: 11px; margin-top: 4px;">Thank you for your payment!</div>
+        <div class="signatures">
+            <div class="sig-block">
+                Depositor / Student Signature
             </div>
-            <div class="sig-line">
-                Authorized Signatory
+            <div class="sig-block">
+                <div><strong>{{ transaction.collector.username if transaction.collector else 'Accounts Officer' }}</strong></div>
+                Authorized Signatory & Seal
             </div>
+        </div>
+
+        <div class="audit-footer">
+            Official receipt generated by {{ school_name }} system ledger. Valid without seal when verified digitally.
         </div>
     </div>
 </body>

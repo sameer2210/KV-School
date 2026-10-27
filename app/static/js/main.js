@@ -1,5 +1,7 @@
 /**
- * PM SHRI Kendriya Vidyalaya - Main JavaScript
+ * Fee Management System - Professional Administrative Client Script
+ * Handles responsive layout, sidebar state, theme switching, 
+ * live student lookup autocomplete, and payment voucher interactions.
  */
 
 // Theme Management
@@ -28,10 +30,10 @@ const ThemeManager = {
             const icon = btn.querySelector('i');
             const text = btn.querySelector('span');
             if (theme === 'dark') {
-                icon.className = 'bi bi-sun-fill';
+                if (icon) icon.className = 'bi bi-sun';
                 if (text) text.textContent = 'Light';
             } else {
-                icon.className = 'bi bi-moon-fill';
+                if (icon) icon.className = 'bi bi-moon';
                 if (text) text.textContent = 'Dark';
             }
         }
@@ -45,7 +47,71 @@ const ThemeManager = {
     }
 };
 
-// Mobile Menu Management
+// Sidebar Layout Manager (Desktop Collapse & Mobile Drawer)
+const SidebarManager = {
+    init() {
+        this.sidebar = document.querySelector('.sidebar');
+        this.toggleBtn = document.getElementById('sidebarToggle');
+        this.overlay = document.getElementById('mobileDrawerOverlay');
+        
+        // Restore desktop collapse preference
+        const isCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
+        if (isCollapsed && window.innerWidth > 768) {
+            document.body.classList.add('sidebar-collapsed');
+        }
+
+        this.bindEvents();
+    },
+
+    bindEvents() {
+        if (this.toggleBtn) {
+            this.toggleBtn.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    this.toggleMobileDrawer();
+                } else {
+                    this.toggleDesktopCollapse();
+                }
+            });
+        }
+
+        if (this.overlay) {
+            this.overlay.addEventListener('click', () => {
+                this.closeMobileDrawer();
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                this.closeMobileDrawer();
+            }
+        });
+    },
+
+    toggleDesktopCollapse() {
+        const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
+        localStorage.setItem('sidebar_collapsed', isCollapsed ? 'true' : 'false');
+    },
+
+    toggleMobileDrawer() {
+        if (this.sidebar) {
+            this.sidebar.classList.toggle('mobile-open');
+            if (this.overlay) {
+                this.overlay.classList.toggle('show');
+            }
+        }
+    },
+
+    closeMobileDrawer() {
+        if (this.sidebar) {
+            this.sidebar.classList.remove('mobile-open');
+        }
+        if (this.overlay) {
+            this.overlay.classList.remove('show');
+        }
+    }
+};
+
+// Mobile Bottom Menu Toggle
 const MobileMenuManager = {
     init() {
         this.moreMenu = document.getElementById('mobileMoreMenu');
@@ -65,7 +131,6 @@ const MobileMenuManager = {
     },
 
     bindEvents() {
-        // Close menu when clicking outside
         document.addEventListener('click', (e) => {
             if (this.moreMenu && this.moreMenu.classList.contains('show')) {
                 const moreContainer = document.querySelector('.mobile-nav-more');
@@ -77,7 +142,6 @@ const MobileMenuManager = {
     }
 };
 
-// Global function for mobile menu toggle
 function toggleMobileMenu() {
     MobileMenuManager.toggle();
 }
@@ -87,11 +151,11 @@ const FlashMessages = {
     init() {
         const alerts = document.querySelectorAll('.alert[data-auto-dismiss]');
         alerts.forEach(alert => {
-            const timeout = parseInt(alert.dataset.autoDismiss) || 5000;
+            const timeout = parseInt(alert.dataset.autoDismiss, 10) || 5000;
             setTimeout(() => {
                 alert.style.opacity = '0';
-                alert.style.transform = 'translateY(-10px)';
-                setTimeout(() => alert.remove(), 300);
+                alert.style.transform = 'translateY(-4px)';
+                setTimeout(() => alert.remove(), 250);
             }, timeout);
         });
     }
@@ -123,16 +187,7 @@ const FormValidator = {
         emails.forEach(field => {
             if (field.value && !this.isValidEmail(field.value)) {
                 isValid = false;
-                this.showError(field, 'Please enter a valid email');
-            }
-        });
-
-        // Phone validation
-        const phones = form.querySelectorAll('input[data-validate-phone]');
-        phones.forEach(field => {
-            if (field.value && !this.isValidPhone(field.value)) {
-                isValid = false;
-                this.showError(field, 'Please enter a valid phone number');
+                this.showError(field, 'Please enter a valid email address');
             }
         });
 
@@ -143,24 +198,23 @@ const FormValidator = {
 
     showError(field, message) {
         field.classList.add('is-invalid');
-        const error = document.createElement('div');
-        error.className = 'form-text text-danger';
+        let error = field.parentNode.querySelector('.text-danger.form-text');
+        if (!error) {
+            error = document.createElement('div');
+            error.className = 'form-text text-danger';
+            field.parentNode.appendChild(error);
+        }
         error.textContent = message;
-        field.parentNode.appendChild(error);
     },
 
     clearError(field) {
         field.classList.remove('is-invalid');
-        const error = field.parentNode.querySelector('.text-danger');
+        const error = field.parentNode.querySelector('.text-danger.form-text');
         if (error) error.remove();
     },
 
     isValidEmail(email) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    },
-
-    isValidPhone(phone) {
-        return /^[0-9]{10}$/.test(phone.replace(/\D/g, ''));
     }
 };
 
@@ -179,13 +233,12 @@ const StudentSearch = {
             top: 100%;
             left: 0;
             right: 0;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            max-height: 300px;
+            border-radius: var(--radius-sm);
+            max-height: 280px;
             overflow-y: auto;
-            z-index: 1000;
+            z-index: 1050;
             display: none;
+            margin-top: 2px;
         `;
         input.parentNode.style.position = 'relative';
         input.parentNode.appendChild(resultsContainer);
@@ -193,10 +246,9 @@ const StudentSearch = {
         let debounceTimer;
         input.addEventListener('input', () => {
             clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => this.search(input, resultsContainer), 300);
+            debounceTimer = setTimeout(() => this.search(input, resultsContainer), 250);
         });
 
-        // Hide results on click outside
         document.addEventListener('click', (e) => {
             if (!input.contains(e.target) && !resultsContainer.contains(e.target)) {
                 resultsContainer.style.display = 'none';
@@ -216,65 +268,44 @@ const StudentSearch = {
             const students = await response.json();
 
             if (students.length === 0) {
-                container.innerHTML = '<div style="padding: 12px; color: var(--text-muted);">No students found</div>';
+                container.innerHTML = '<div style="padding: 10px 14px; font-size: 12px; color: var(--text-muted);">No student matches found</div>';
             } else {
                 container.innerHTML = students.map(s => `
                     <div class="search-result-item"
                          data-id="${s.id}"
                          data-name="${s.name}"
-                         style="padding: 12px; cursor: pointer; border-bottom: 1px solid var(--border-color);">
-                        <strong>${s.name}</strong>
-                        <br>
-                        <small style="color: var(--text-muted);">${s.student_id} - ${s.batch}</small>
+                         style="padding: 9px 14px; cursor: pointer; border-bottom: 1px solid var(--border-color); font-size: 12.5px;">
+                        <strong style="color: var(--text-primary);">${s.name}</strong>
+                        <div style="color: var(--text-muted); font-size: 11px; margin-top: 1px;">
+                            ID: ${s.student_id} &bull; Class: ${s.batch || 'Not Assigned'}
+                        </div>
                     </div>
                 `).join('');
 
                 container.querySelectorAll('.search-result-item').forEach(item => {
                     item.addEventListener('click', () => {
-                        const hiddenInput = document.querySelector(input.dataset.studentSearch);
+                        const targetSelector = input.dataset.studentSearch;
+                        const hiddenInput = document.querySelector(targetSelector);
                         if (hiddenInput) {
                             hiddenInput.value = item.dataset.id;
-                            // Trigger change event
                             hiddenInput.dispatchEvent(new Event('change'));
                         }
                         input.value = item.dataset.name;
                         container.style.display = 'none';
-                    });
-
-                    item.addEventListener('mouseenter', () => {
-                        item.style.background = 'var(--bg-table-stripe)';
-                    });
-                    item.addEventListener('mouseleave', () => {
-                        item.style.background = '';
                     });
                 });
             }
 
             container.style.display = 'block';
         } catch (error) {
-            console.error('Search error:', error);
+            console.error('Student search error:', error);
         }
     }
 };
 
-// Confirmation Dialogs
-const ConfirmDialog = {
-    init() {
-        document.querySelectorAll('[data-confirm]').forEach(el => {
-            el.addEventListener('click', (e) => {
-                const message = el.dataset.confirm || 'Are you sure?';
-                if (!confirm(message)) {
-                    e.preventDefault();
-                }
-            });
-        });
-    }
-};
-
-// Date Picker Enhancement
+// Date Default Setup
 const DateHelper = {
     init() {
-        // Set today's date as default for date inputs without value
         document.querySelectorAll('input[type="date"][data-default-today]').forEach(input => {
             if (!input.value) {
                 input.value = new Date().toISOString().split('T')[0];
@@ -283,57 +314,17 @@ const DateHelper = {
     }
 };
 
-// Print Functionality
-const PrintHelper = {
-    print(elementId) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>Print</title>
-                    <link rel="stylesheet" href="/static/css/style.css">
-                    <style>
-                        body { padding: 20px; }
-                        @media print {
-                            body { padding: 0; }
-                        }
-                    </style>
-                </head>
-                <body>${element.innerHTML}</body>
-                </html>
-            `);
-            printWindow.document.close();
-            printWindow.onload = () => {
-                printWindow.print();
-                printWindow.close();
-            };
-        }
-    }
-};
-
-// Attendance Marking Helper
-const AttendanceHelper = {
-    markAll(status) {
-        document.querySelectorAll(`input[type="radio"][value="${status}"]`).forEach(radio => {
-            radio.checked = true;
-        });
-    }
-};
-
-// Initialize all modules on DOM ready
+// Global Initialization
 document.addEventListener('DOMContentLoaded', () => {
     ThemeManager.init();
+    SidebarManager.init();
     MobileMenuManager.init();
     FlashMessages.init();
     FormValidator.init();
     StudentSearch.init();
-    ConfirmDialog.init();
     DateHelper.init();
 });
 
-// Export for global access
-window.PrintHelper = PrintHelper;
-window.AttendanceHelper = AttendanceHelper;
+window.toggleMobileMenu = toggleMobileMenu;
 window.ThemeManager = ThemeManager;
+window.SidebarManager = SidebarManager;

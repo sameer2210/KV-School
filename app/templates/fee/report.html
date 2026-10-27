@@ -1,34 +1,42 @@
 {% extends "base.html" %}
 
-{% block title %}Fee Report - PM SHRI Kendriya Vidyalaya{% endblock %}
-{% block page_title %}Fee Collection & Financial Reports<small>Comprehensive analytical reports and exports</small>{% endblock %}
+{% block title %}Fee Collection Reports & Reconciliation - Fee Management System{% endblock %}
+{% block page_title %}Financial Reports<small>Monthly and quarterly fee collection audits and exports</small>{% endblock %}
 
 {% block content %}
 <div class="card">
-    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <h3 class="card-title" style="margin: 0;">Fee Collection Report</h3>
+    <div class="card-header">
+        <div class="d-flex align-items-center gap-2">
+            <h3 class="card-title">
+                <i class="bi bi-file-earmark-bar-graph"></i>
+                <span>Fee Collection & Reconciliation Report</span>
+            </h3>
+        </div>
         <div style="display: flex; gap: 8px;">
             <a href="{{ url_for('fee.export_report_csv', month=month, year=year) }}" class="btn btn-sm btn-outline-success">
-                <i class="bi bi-file-earmark-spreadsheet"></i> Export CSV
+                <i class="bi bi-file-earmark-spreadsheet"></i>
+                <span>Export CSV</span>
             </a>
             <a href="{{ url_for('fee.export_report_excel', month=month, year=year) }}" class="btn btn-sm btn-success">
-                <i class="bi bi-file-earmark-excel"></i> Export Excel
+                <i class="bi bi-file-earmark-excel"></i>
+                <span>Export Excel</span>
             </a>
         </div>
     </div>
 
+    <!-- Filter Bar -->
     <div class="filter-bar">
         <form method="GET" style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; width: 100%;">
             <div class="filter-group" style="flex: 1; min-width: 140px;">
-                <label>Month</label>
+                <label>Billing Month</label>
                 <select name="month" class="form-control form-select">
                     {% for m, name in months %}
                     <option value="{{ m }}" {{ 'selected' if month == m }}>{{ name }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="filter-group" style="flex: 1; min-width: 120px;">
-                <label>Year</label>
+            <div class="filter-group" style="flex: 1; min-width: 110px;">
+                <label>Calendar Year</label>
                 <input type="number" name="year" class="form-control" value="{{ year }}" min="2020" max="2035">
             </div>
             <div class="filter-group" style="flex: 1; min-width: 140px;">
@@ -40,29 +48,36 @@
                     {% endfor %}
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary"><i class="bi bi-graph-up"></i> Generate Report</button>
+            <div style="display: flex; gap: 6px;">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-graph-up"></i> Generate Report</button>
+            </div>
         </form>
     </div>
 
     <div class="card-body">
+        <!-- Monthly KPI -->
         <div class="stat-cards" style="margin-bottom: 24px;">
             <div class="stat-card">
                 <div class="stat-icon success"><i class="bi bi-cash-stack"></i></div>
                 <div class="stat-info">
-                    <h3>₹{{ "{:,.2f}".format(total) }}</h3>
-                    <p>Total Month Collection ({{ months[month-1][1] }} {{ year }})</p>
+                    <p>Total Monthly Collection</p>
+                    <h3 class="text-success">₹{{ "{:,.2f}".format(total) }}</h3>
+                    <small class="text-muted">Cleared receipts for {{ months[month-1][1] }} {{ year }}</small>
                 </div>
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 24px;">
+        <!-- 2-Column Breakdowns -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 24px;">
             <!-- Quarter-wise Breakdown -->
-            <div class="card" style="box-shadow: none; border: 1px solid var(--border-color);">
-                <div class="card-header" style="background: rgba(0,0,0,0.02);">
-                    <h4 style="margin: 0; font-size: 15px;"><i class="bi bi-pie-chart"></i> Quarter-wise Collections (Session {{ current_session }})</h4>
+            <div class="card" style="box-shadow: none; border: 1px solid var(--border-color); margin-bottom: 0;">
+                <div class="card-header" style="background: var(--bg-subtle);">
+                    <h4 style="margin: 0; font-size: 13px; font-weight: 600;">
+                        <i class="bi bi-pie-chart text-primary"></i> Quarter-wise Collections (Session {{ current_session }})
+                    </h4>
                 </div>
                 <div class="card-body" style="padding: 0;">
-                    <table class="table" style="margin: 0; font-size: 13px;">
+                    <table class="table" style="margin: 0; font-size: 12.5px;">
                         <thead>
                             <tr>
                                 <th>Quarter</th>
@@ -76,12 +91,14 @@
                                 <tr>
                                     <td><strong>{{ qtr or 'One-Time / Other' }}</strong></td>
                                     <td>{{ cnt }}</td>
-                                    <td class="text-right text-success"><strong>₹{{ "{:,.2f}".format(amt) }}</strong></td>
+                                    <td class="text-right">
+                                        <span class="currency-val text-success">₹{{ "{:,.2f}".format(amt) }}</span>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             {% else %}
                                 <tr>
-                                    <td colspan="3" class="text-center text-muted" style="padding: 16px;">No transactions recorded for this session.</td>
+                                    <td colspan="3" class="text-center text-muted" style="padding: 16px;">No transactions recorded for this period.</td>
                                 </tr>
                             {% endif %}
                         </tbody>
@@ -90,17 +107,19 @@
             </div>
 
             <!-- Fee Component Breakdown -->
-            <div class="card" style="box-shadow: none; border: 1px solid var(--border-color);">
-                <div class="card-header" style="background: rgba(0,0,0,0.02);">
-                    <h4 style="margin: 0; font-size: 15px;"><i class="bi bi-tags"></i> Fee Component Breakdown</h4>
+            <div class="card" style="box-shadow: none; border: 1px solid var(--border-color); margin-bottom: 0;">
+                <div class="card-header" style="background: var(--bg-subtle);">
+                    <h4 style="margin: 0; font-size: 13px; font-weight: 600;">
+                        <i class="bi bi-tags text-primary"></i> Fee Head / Component Breakdown
+                    </h4>
                 </div>
                 <div class="card-body" style="padding: 0;">
-                    <table class="table" style="margin: 0; font-size: 13px;">
+                    <table class="table" style="margin: 0; font-size: 12.5px;">
                         <thead>
                             <tr>
                                 <th>Component</th>
-                                <th>Count</th>
-                                <th class="text-right">Total (₹)</th>
+                                <th>Txn Count</th>
+                                <th class="text-right">Total Amount</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -109,7 +128,9 @@
                                 <tr>
                                     <td><strong>{{ comp or 'General' }}</strong></td>
                                     <td>{{ cnt }}</td>
-                                    <td class="text-right text-success"><strong>₹{{ "{:,.2f}".format(amt) }}</strong></td>
+                                    <td class="text-right">
+                                        <span class="currency-val text-success">₹{{ "{:,.2f}".format(amt) }}</span>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             {% else %}
@@ -125,34 +146,50 @@
 
         <!-- Payment Mode Breakdown -->
         {% if mode_breakdown %}
-        <h4 class="mt-4 mb-3" style="font-size: 15px;"><i class="bi bi-credit-card"></i> Payment Mode Breakdown ({{ months[month-1][1] }} {{ year }})</h4>
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Payment Mode</th>
-                        <th>Transactions Count</th>
-                        <th class="text-right">Total Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for mode, amount, count in mode_breakdown %}
-                    <tr>
-                        <td><span class="badge badge-secondary">{{ mode.replace('_', ' ').title() }}</span></td>
-                        <td>{{ count }}</td>
-                        <td class="text-right text-success"><strong>₹{{ "{:,.2f}".format(amount) }}</strong></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="card" style="box-shadow: none; border: 1px solid var(--border-color); margin-bottom: 24px;">
+            <div class="card-header" style="background: var(--bg-subtle);">
+                <h4 style="margin: 0; font-size: 13px; font-weight: 600;">
+                    <i class="bi bi-credit-card text-primary"></i> Payment Instrument Breakdown ({{ months[month-1][1] }} {{ year }})
+                </h4>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Payment Mode</th>
+                            <th>Transactions Count</th>
+                            <th class="text-right">Total Amount (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mode, amount, count in mode_breakdown %}
+                        <tr>
+                            <td><span class="badge badge-secondary">{{ mode.replace('_', ' ').title() }}</span></td>
+                            <td>{{ count }}</td>
+                            <td class="text-right">
+                                <span class="currency-val text-success">₹{{ "{:,.2f}".format(amount) }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
         {% endif %}
 
         <!-- Daily Trend Chart -->
         {% if daily_collection %}
-        <h4 class="mt-4 mb-3" style="font-size: 15px;"><i class="bi bi-calendar-event"></i> Daily Collection Trend</h4>
-        <div class="chart-container" style="height: 300px;">
-            <canvas id="dailyChart"></canvas>
+        <div class="card" style="box-shadow: none; border: 1px solid var(--border-color); margin-bottom: 0;">
+            <div class="card-header" style="background: var(--bg-subtle);">
+                <h4 style="margin: 0; font-size: 13px; font-weight: 600;">
+                    <i class="bi bi-bar-chart text-primary"></i> Daily Collections Trend
+                </h4>
+            </div>
+            <div class="card-body">
+                <div style="height: 260px;">
+                    <canvas id="dailyChart"></canvas>
+                </div>
+            </div>
         </div>
         {% endif %}
     </div>
@@ -170,14 +207,37 @@
             datasets: [{
                 label: 'Collection (₹)',
                 data: [{% for date, total in daily_collection %}{{ total }}{% if not loop.last %}, {% endif %}{% endfor %}],
-                backgroundColor: '#10b981'
+                backgroundColor: '#1e3a5f',
+                borderRadius: 3,
+                maxBarThickness: 32
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } }
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Collection: ₹' + Number(context.raw).toLocaleString('en-IN', { minimumFractionDigits: 2 });
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '₹' + Number(value).toLocaleString('en-IN');
+                        }
+                    }
+                }
+            }
         }
     });
     {% endif %}

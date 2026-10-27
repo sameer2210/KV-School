@@ -1,35 +1,56 @@
 {% extends "base.html" %}
 
-{% block title %}Pending Fees - PM SHRI Kendriya Vidyalaya{% endblock %}
-{% block page_title %}Pending Fees<small>Outstanding quarterly school dues</small>{% endblock %}
+{% block title %}Pending Fees - Fee Management System{% endblock %}
+{% block page_title %}Pending Dues<small>Outstanding quarterly fee ledger by student</small>{% endblock %}
 
 {% block content %}
 <!-- Summary Stats Cards -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
-    <div class="card" style="padding: 16px; border-left: 4px solid #3b82f6;">
-        <div style="color: var(--text-muted); font-size: 13px;">Total Assessed Fees</div>
-        <div style="font-size: 24px; font-weight: 700; color: #1e3a8a;">₹{{ "{:,.2f}".format(total_expected) }}</div>
+<div class="stat-cards" style="margin-bottom: 20px;">
+    <div class="stat-card">
+        <div class="stat-icon primary"><i class="bi bi-calculator"></i></div>
+        <div class="stat-info">
+            <p>Total Assessed Dues</p>
+            <h3>₹{{ "{:,.2f}".format(total_expected) }}</h3>
+            <small class="text-muted">Total demand for selected criteria</small>
+        </div>
     </div>
-    <div class="card" style="padding: 16px; border-left: 4px solid #10b981;">
-        <div style="color: var(--text-muted); font-size: 13px;">Total Collected</div>
-        <div style="font-size: 24px; font-weight: 700; color: #059669;">₹{{ "{:,.2f}".format(total_paid) }}</div>
+    <div class="stat-card">
+        <div class="stat-icon success"><i class="bi bi-check2-all"></i></div>
+        <div class="stat-info">
+            <p>Total Collected</p>
+            <h3 class="text-success">₹{{ "{:,.2f}".format(total_paid) }}</h3>
+            <small class="text-muted">Cleared & reconciled receipts</small>
+        </div>
     </div>
-    <div class="card" style="padding: 16px; border-left: 4px solid #ef4444;">
-        <div style="color: var(--text-muted); font-size: 13px;">Total Outstanding Balance</div>
-        <div style="font-size: 24px; font-weight: 700; color: #dc2626;">₹{{ "{:,.2f}".format(total_pending) }}</div>
+    <div class="stat-card">
+        <div class="stat-icon {{ 'danger' if total_pending > 0 else 'success' }}">
+            <i class="bi bi-hourglass-bottom"></i>
+        </div>
+        <div class="stat-info">
+            <p>Total Outstanding</p>
+            <h3 class="{{ 'text-danger' if total_pending > 0 else 'text-success' }}">₹{{ "{:,.2f}".format(total_pending) }}</h3>
+            <small class="text-muted">Receivable school balance</small>
+        </div>
     </div>
 </div>
 
 <div class="card">
-    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <h3 class="card-title" style="margin: 0;">Pending Dues by Student</h3>
+    <div class="card-header">
+        <div class="d-flex align-items-center gap-2">
+            <h3 class="card-title">
+                <i class="bi bi-clock-history"></i>
+                <span>Student Fee Receivables</span>
+            </h3>
+        </div>
         <div>
             <a href="{{ url_for('fee.export_pending_csv', batch_id=selected_batch, academic_session=selected_session, quarter=selected_quarter) }}" class="btn btn-sm btn-outline-success">
-                <i class="bi bi-file-earmark-spreadsheet"></i> Export CSV
+                <i class="bi bi-file-earmark-spreadsheet"></i>
+                <span>Export CSV</span>
             </a>
         </div>
     </div>
 
+    <!-- Filter Bar -->
     <div class="filter-bar">
         <form method="GET" style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; width: 100%;">
             <div class="filter-group" style="flex: 1; min-width: 140px;">
@@ -42,7 +63,7 @@
                 </select>
             </div>
             <div class="filter-group" style="flex: 1; min-width: 120px;">
-                <label>Quarter</label>
+                <label>Billing Quarter</label>
                 <select name="quarter" class="form-control form-select">
                     <option value="">All Quarters</option>
                     {% for q in quarters %}
@@ -59,50 +80,61 @@
                     {% endfor %}
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary"><i class="bi bi-filter"></i> Filter</button>
-            <a href="{{ url_for('fee.pending_fees') }}" class="btn btn-outline">Reset</a>
+            <div style="display: flex; gap: 6px;">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-funnel"></i> Filter</button>
+                <a href="{{ url_for('fee.pending_fees') }}" class="btn btn-outline">Reset</a>
+            </div>
         </form>
     </div>
 
     <div class="card-body" style="padding: 0;">
         {% if pending_list %}
         <div class="table-responsive">
-            <table class="table">
+            <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Student</th>
+                        <th>Student Name & ID</th>
                         <th class="hide-mobile">Class / Batch</th>
                         <th>Pending Quarters</th>
-                        <th class="text-right hide-mobile">Assessed</th>
-                        <th class="text-right hide-mobile">Paid</th>
-                        <th class="text-right">Outstanding</th>
-                        <th>Action</th>
+                        <th class="text-right hide-mobile">Assessed (₹)</th>
+                        <th class="text-right hide-mobile">Paid (₹)</th>
+                        <th class="text-right">Outstanding (₹)</th>
+                        <th style="width: 100px; text-align: center;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for item in pending_list %}
                     <tr>
                         <td>
-                            <a href="{{ url_for('student.view_student', id=item.student.id) }}">
-                                <strong>{{ item.student.full_name }}</strong>
+                            <a href="{{ url_for('student.view_student', id=item.student.id) }}" style="font-weight: 600; color: var(--text-primary);">
+                                {{ item.student.full_name }}
                             </a>
-                            <br><small class="text-muted">{{ item.student.student_id }}</small>
+                            <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">
+                                {{ item.student.student_id }}
+                            </div>
                         </td>
                         <td class="hide-mobile">{{ item.student.batch.name if item.student.batch else '-' }}</td>
                         <td>
                             {% for qtr in item.quarters %}
-                            <span class="badge badge-secondary" style="font-size: 11px;">{{ qtr }}</span>
+                            <span class="badge badge-secondary" style="font-size: 10px;">{{ qtr }}</span>
                             {% endfor %}
                             {% if item.overdue_count > 0 %}
-                            <span class="badge badge-danger" style="font-size: 11px;">{{ item.overdue_count }} Overdue</span>
+                            <span class="badge badge-danger" style="font-size: 10px;">{{ item.overdue_count }} Overdue</span>
                             {% endif %}
                         </td>
-                        <td class="text-right hide-mobile">₹{{ "{:,.2f}".format(item.expected) }}</td>
-                        <td class="text-right text-success hide-mobile">₹{{ "{:,.2f}".format(item.paid) }}</td>
-                        <td class="text-right text-danger"><strong>₹{{ "{:,.2f}".format(item.pending) }}</strong></td>
-                        <td>
-                            <a href="{{ url_for('fee.collect_fee', student_id=item.student.id) }}" class="btn btn-sm btn-success">
-                                <i class="bi bi-cash"></i><span class="hide-mobile"> Collect</span>
+                        <td class="text-right hide-mobile">
+                            <span class="currency-val">₹{{ "{:,.2f}".format(item.expected) }}</span>
+                        </td>
+                        <td class="text-right hide-mobile text-success">
+                            <span class="currency-val">₹{{ "{:,.2f}".format(item.paid) }}</span>
+                        </td>
+                        <td class="text-right">
+                            <span class="currency-val text-danger">₹{{ "{:,.2f}".format(item.pending) }}</span>
+                        </td>
+                        <td style="text-align: center;">
+                            <a href="{{ url_for('fee.collect_fee', student_id=item.student.id) }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-cash"></i>
+                                <span>Collect</span>
                             </a>
                         </td>
                     </tr>
@@ -112,9 +144,9 @@
         </div>
         {% else %}
         <div class="empty-state">
-            <i class="bi bi-check-circle" style="color: #10b981;"></i>
-            <h3>No Pending Fees!</h3>
-            <p>All students are completely up to date with their fees for the selected criteria.</p>
+            <i class="bi bi-check2-circle" style="color: var(--success); opacity: 1;"></i>
+            <h3>No Pending Dues Found</h3>
+            <p>All student fee accounts match fully reconciled receipts for this selection.</p>
         </div>
         {% endif %}
     </div>

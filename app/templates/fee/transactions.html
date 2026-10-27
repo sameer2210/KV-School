@@ -1,19 +1,25 @@
 {% extends "base.html" %}
 
-{% block title %}Fee Transactions - PM SHRI Kendriya Vidyalaya{% endblock %}
-{% block page_title %}Fee Transactions<small>Searchable payment ledger and audit records</small>{% endblock %}
+{% block title %}Payment History & Ledger - Fee Management System{% endblock %}
+{% block page_title %}Payment History<small>Searchable audit ledger of fee transactions</small>{% endblock %}
 
 {% block content %}
 <div class="card">
-    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <h3 class="card-title" style="margin: 0;">Payment Transactions</h3>
+    <div class="card-header">
+        <div class="d-flex align-items-center gap-2">
+            <h3 class="card-title">
+                <i class="bi bi-journal-check"></i>
+                <span>Payment Transactions Ledger</span>
+            </h3>
+            <span class="badge badge-secondary">{{ total_count }} records</span>
+        </div>
         <div style="display: flex; align-items: center; gap: 10px;">
-            <span class="badge badge-primary" style="font-size: 14px; padding: 6px 12px;">
-                Total Collection: ₹{{ "{:,.2f}".format(total_amount) }}
-            </span>
-            <span class="badge badge-secondary" style="font-size: 13px;">{{ total_count }} records</span>
-            <a href="{{ url_for('fee.export_transactions_csv', search=selected_search, academic_session=selected_session, quarter=selected_quarter, payment_mode=selected_mode, status=selected_status) }}" class="btn btn-sm btn-outline-success">
-                <i class="bi bi-file-earmark-spreadsheet"></i> Export CSV
+            <div class="badge badge-primary" style="font-size: 12px; padding: 5px 12px;">
+                Filtered Total: <strong>₹{{ "{:,.2f}".format(total_amount) }}</strong>
+            </div>
+            <a href="{{ url_for('fee.export_transactions_csv', search=selected_search, academic_session=selected_session, quarter=selected_quarter, payment_mode=selected_mode, status=selected_status, start_date=request.args.get('start_date', ''), end_date=request.args.get('end_date', '')) }}" class="btn btn-sm btn-outline-success">
+                <i class="bi bi-file-earmark-spreadsheet"></i>
+                <span>Export CSV</span>
             </a>
         </div>
     </div>
@@ -21,11 +27,11 @@
     <!-- Filter Bar -->
     <div class="filter-bar">
         <form method="GET" style="display: flex; gap: 10px; width: 100%; align-items: flex-end; flex-wrap: wrap;">
-            <div class="filter-group" style="flex: 1.5; min-width: 160px;">
+            <div class="filter-group" style="flex: 1.5; min-width: 170px;">
                 <label>Search Student or Receipt #</label>
                 <input type="text" name="search" class="form-control" placeholder="Name, ID, or REC..." value="{{ selected_search or '' }}">
             </div>
-            <div class="filter-group" style="flex: 1; min-width: 120px;">
+            <div class="filter-group" style="flex: 1; min-width: 110px;">
                 <label>Session</label>
                 <select name="academic_session" class="form-control form-select">
                     <option value="">All Sessions</option>
@@ -34,7 +40,7 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="filter-group" style="flex: 1; min-width: 100px;">
+            <div class="filter-group" style="flex: 1; min-width: 90px;">
                 <label>Quarter</label>
                 <select name="quarter" class="form-control form-select">
                     <option value="">All Quarters</option>
@@ -68,64 +74,83 @@
                 <label>End Date</label>
                 <input type="date" name="end_date" class="form-control" value="{{ request.args.get('end_date', '') }}">
             </div>
-            <button type="submit" class="btn btn-primary"><i class="bi bi-filter"></i> Filter</button>
-            <a href="{{ url_for('fee.list_transactions') }}" class="btn btn-outline">Reset</a>
+            <div style="display: flex; gap: 6px;">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-funnel"></i> Filter</button>
+                <a href="{{ url_for('fee.list_transactions') }}" class="btn btn-outline">Reset</a>
+            </div>
         </form>
     </div>
 
+    <!-- Table -->
     <div class="card-body" style="padding: 0;">
         {% if transactions.items %}
         <div class="table-responsive">
-            <table class="table">
+            <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Receipt #</th>
-                        <th>Student</th>
+                        <th style="width: 140px;">Receipt #</th>
+                        <th>Student Name & ID</th>
                         <th>Session / Quarter</th>
-                        <th>Component</th>
-                        <th>Amount</th>
-                        <th class="hide-mobile">Mode</th>
-                        <th class="hide-mobile">Date</th>
+                        <th>Fee Head</th>
+                        <th class="text-right">Amount</th>
+                        <th class="hide-mobile">Payment Mode</th>
+                        <th class="hide-mobile">Payment Date</th>
                         <th>Status</th>
-                        <th class="hide-mobile">Collector</th>
-                        <th>Action</th>
+                        <th class="hide-mobile">Staff</th>
+                        <th style="width: 80px; text-align: center;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for txn in transactions.items %}
-                    <tr style="{{ 'opacity: 0.6; text-decoration: line-through;' if txn.status == 'REVERSED' else '' }}">
+                    <tr style="{{ 'opacity: 0.65; background-color: var(--bg-subtle);' if txn.status == 'REVERSED' else '' }}">
                         <td>
-                            <a href="{{ url_for('fee.view_receipt', id=txn.id) }}">
-                                <strong>{{ txn.receipt_number }}</strong>
+                            <a href="{{ url_for('fee.view_receipt', id=txn.id) }}" style="font-weight: 600; font-family: var(--font-mono);">
+                                {{ txn.receipt_number }}
                             </a>
                         </td>
                         <td>
-                            <a href="{{ url_for('student.view_student', id=txn.student_id) }}">
-                                {{ txn.student.full_name if txn.student else 'N/A' }}
+                            {% if txn.student %}
+                            <a href="{{ url_for('student.view_student', id=txn.student_id) }}" style="font-weight: 600; color: var(--text-primary);">
+                                {{ txn.student.full_name }}
                             </a>
-                            <br><small class="text-muted">{{ txn.student.student_id if txn.student else '' }}</small>
+                            <div style="font-size: 11px; color: var(--text-muted);">
+                                ID: {{ txn.student.student_id }} &bull; {{ txn.student.batch.name if txn.student.batch else 'No Class' }}
+                            </div>
+                            {% else %}
+                            <span class="text-muted">N/A</span>
+                            {% endif %}
                         </td>
                         <td>
                             {{ txn.academic_session or '-' }}
                             {% if txn.quarter %}
-                            <span class="badge badge-secondary" style="font-size: 11px;">{{ txn.quarter }}</span>
+                            <span class="badge badge-secondary" style="font-size: 10px; margin-left: 2px;">{{ txn.quarter }}</span>
                             {% endif %}
                         </td>
                         <td>{{ txn.fee_component or 'Fee' }}</td>
-                        <td class="{{ 'text-success' if txn.status != 'REVERSED' else 'text-muted' }}">
-                            <strong>₹{{ "{:,.2f}".format(txn.amount) }}</strong>
+                        <td class="text-right">
+                            <span class="currency-val {{ 'text-success' if txn.status != 'REVERSED' else 'text-muted' }}">
+                                ₹{{ "{:,.2f}".format(txn.amount) }}
+                            </span>
                         </td>
-                        <td class="hide-mobile"><span class="badge badge-secondary">{{ txn.payment_mode }}</span></td>
-                        <td class="hide-mobile">{{ txn.payment_date.strftime('%d-%m-%Y') }}</td>
+                        <td class="hide-mobile">
+                            <span class="badge badge-secondary">{{ txn.payment_mode.replace('_', ' ') if txn.payment_mode else 'CASH' }}</span>
+                        </td>
+                        <td class="hide-mobile" style="color: var(--text-secondary); font-size: 12px;">
+                            {{ txn.payment_date.strftime('%d-%b-%Y') if txn.payment_date else '-' }}
+                        </td>
                         <td>
                             <span class="badge {{ 'badge-success' if txn.status != 'REVERSED' else 'badge-danger' }}">
+                                <i class="bi bi-{{ 'check-circle' if txn.status != 'REVERSED' else 'slash-circle' }}"></i>
                                 {{ txn.status }}
                             </span>
                         </td>
-                        <td class="hide-mobile">{{ txn.collector.username if txn.collector else '-' }}</td>
-                        <td>
+                        <td class="hide-mobile" style="font-size: 11px; color: var(--text-muted);">
+                            {{ txn.collector.username if txn.collector else 'Staff' }}
+                        </td>
+                        <td style="text-align: center;">
                             <a href="{{ url_for('fee.view_receipt', id=txn.id) }}" class="btn btn-sm btn-outline" title="View Receipt">
                                 <i class="bi bi-receipt"></i>
+                                <span>Receipt</span>
                             </a>
                         </td>
                     </tr>
@@ -134,28 +159,33 @@
             </table>
         </div>
 
+        <!-- Pagination Bar -->
         {% if transactions.pages > 1 %}
-        <div class="card-footer" style="display: flex; justify-content: center;">
-            <ul class="pagination">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-top: 1px solid var(--border-color); background: var(--bg-card); font-size: 12px;">
+            <span class="text-muted">
+                Showing page {{ transactions.page }} of {{ transactions.pages }} ({{ transactions.total }} records)
+            </span>
+            <div class="btn-group">
                 {% if transactions.has_prev %}
-                <li class="page-item"><a class="page-link" href="{{ url_for('fee.list_transactions', page=transactions.prev_num, search=selected_search, academic_session=selected_session, quarter=selected_quarter, payment_mode=selected_mode, status=selected_status) }}"><i class="bi bi-chevron-left"></i></a></li>
+                <a href="{{ url_for('fee.list_transactions', page=transactions.prev_num, search=selected_search, academic_session=selected_session, quarter=selected_quarter, payment_mode=selected_mode, status=selected_status, start_date=request.args.get('start_date', ''), end_date=request.args.get('end_date', '')) }}" class="btn btn-sm btn-outline">
+                    &laquo; Prev
+                </a>
                 {% endif %}
-                {% for p in transactions.iter_pages() %}
-                {% if p %}
-                <li class="page-item {{ 'active' if p == transactions.page }}"><a class="page-link" href="{{ url_for('fee.list_transactions', page=p, search=selected_search, academic_session=selected_session, quarter=selected_quarter, payment_mode=selected_mode, status=selected_status) }}">{{ p }}</a></li>
-                {% endif %}
-                {% endfor %}
                 {% if transactions.has_next %}
-                <li class="page-item"><a class="page-link" href="{{ url_for('fee.list_transactions', page=transactions.next_num, search=selected_search, academic_session=selected_session, quarter=selected_quarter, payment_mode=selected_mode, status=selected_status) }}"><i class="bi bi-chevron-right"></i></a></li>
+                <a href="{{ url_for('fee.list_transactions', page=transactions.next_num, search=selected_search, academic_session=selected_session, quarter=selected_quarter, payment_mode=selected_mode, status=selected_status, start_date=request.args.get('start_date', ''), end_date=request.args.get('end_date', '')) }}" class="btn btn-sm btn-outline">
+                    Next &raquo;
+                </a>
                 {% endif %}
-            </ul>
+            </div>
         </div>
         {% endif %}
+
         {% else %}
         <div class="empty-state">
-            <i class="bi bi-receipt"></i>
-            <h3>No Transactions Found</h3>
-            <p>Try adjusting your search criteria or date filters.</p>
+            <i class="bi bi-search"></i>
+            <h3>No Transactions Match Criteria</h3>
+            <p>Try resetting the filter options or search query.</p>
+            <a href="{{ url_for('fee.list_transactions') }}" class="btn btn-outline">Reset Filter</a>
         </div>
         {% endif %}
     </div>

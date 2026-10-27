@@ -1,64 +1,84 @@
 {% extends "base.html" %}
-{% block title %}Fee Defaulters - PM SHRI Kendriya Vidyalaya{% endblock %}
-{% block page_title %}Fee Defaulters<small>Students with overdue fee payments</small>{% endblock %}
+
+{% block title %}Fee Defaulters List - Fee Management System{% endblock %}
+{% block page_title %}Fee Defaulters<small>Students with overdue fee payments requiring follow-up</small>{% endblock %}
 
 {% block content %}
 <div class="card">
-    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <h3 class="card-title" style="margin: 0;">Overdue Fee Dues</h3>
-        <span class="badge badge-danger" style="font-size: 14px; padding: 6px 12px;">
-            Total Overdue: ₹{{ "{:,.2f}".format(total_overdue_amount) }}
-        </span>
+    <div class="card-header">
+        <div class="d-flex align-items-center gap-2">
+            <h3 class="card-title">
+                <i class="bi bi-exclamation-triangle text-danger"></i>
+                <span>Overdue Accounts & Defaulters</span>
+            </h3>
+        </div>
+        <div>
+            <span class="badge badge-danger" style="font-size: 13px; padding: 5px 12px;">
+                Total Overdue: <strong>₹{{ "{:,.2f}".format(total_overdue_amount) }}</strong>
+            </span>
+        </div>
     </div>
     <div class="card-body" style="padding: 0;">
         {% if overdue %}
         <div class="table-responsive">
-            <table class="table">
+            <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Student</th>
+                        <th>Student Name & ID</th>
                         <th>Class / Batch</th>
                         <th>Session / Quarter</th>
-                        <th>Component</th>
-                        <th class="text-right">Pending Due</th>
-                        <th>Due Date</th>
-                        <th>Days Overdue</th>
+                        <th>Fee Head</th>
+                        <th class="text-right">Overdue Balance</th>
+                        <th>Scheduled Due Date</th>
+                        <th>Overdue Period</th>
                         <th>Parent Contact</th>
-                        <th>Action</th>
+                        <th style="width: 100px; text-align: center;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for due in overdue %}
                     <tr>
                         <td>
-                            <a href="{{ url_for('student.view_student', id=due.student_id) }}">
-                                <strong>{{ due.student.full_name }}</strong>
+                            <a href="{{ url_for('student.view_student', id=due.student_id) }}" style="font-weight: 600; color: var(--text-primary);">
+                                {{ due.student.full_name }}
                             </a>
-                            <br><small class="text-muted">{{ due.student.student_id }}</small>
+                            <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">
+                                {{ due.student.student_id }}
+                            </div>
                         </td>
                         <td>{{ due.student.batch.name if due.student.batch else '-' }}</td>
                         <td>
-                            {{ due.academic_session or '-' }}
+                            <span>{{ due.academic_session or '-' }}</span>
                             {% if due.quarter %}
-                            <span class="badge badge-secondary" style="font-size: 11px;">{{ due.quarter }}</span>
+                            <span class="badge badge-secondary" style="font-size: 10px; margin-left: 2px;">{{ due.quarter }}</span>
                             {% endif %}
                         </td>
                         <td>{{ due.fee_component or 'Tuition Fee' }}</td>
-                        <td class="text-right text-danger">
-                            <strong>₹{{ "{:,.2f}".format(due.pending_amount) }}</strong>
+                        <td class="text-right">
+                            <span class="currency-val text-danger">
+                                ₹{{ "{:,.2f}".format(due.pending_amount) }}
+                            </span>
                         </td>
-                        <td>{{ due.due_date.strftime('%d-%m-%Y') }}</td>
+                        <td>{{ due.due_date.strftime('%d-%b-%Y') if due.due_date else '-' }}</td>
                         <td>
                             <span class="badge badge-danger">
-                                {{ (today - due.due_date).days }} days
+                                <i class="bi bi-clock-history"></i>
+                                {{ (today - due.due_date).days }} days overdue
                             </span>
                         </td>
                         <td>
-                            {{ due.student.parent_phone or '-' }}
+                            {% if due.student.parent_phone %}
+                            <a href="tel:{{ due.student.parent_phone }}" style="color: var(--text-secondary); font-family: var(--font-mono);">
+                                <i class="bi bi-telephone"></i> {{ due.student.parent_phone }}
+                            </a>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
                         </td>
-                        <td>
+                        <td style="text-align: center;">
                             <a href="{{ url_for('fee.collect_fee', student_id=due.student_id) }}" class="btn btn-sm btn-success">
-                                <i class="bi bi-cash"></i> Collect
+                                <i class="bi bi-cash"></i>
+                                <span>Collect</span>
                             </a>
                         </td>
                     </tr>
@@ -68,9 +88,10 @@
         </div>
         {% else %}
         <div class="empty-state">
-            <i class="bi bi-emoji-smile" style="color: #10b981;"></i>
-            <h3>No Defaulters!</h3>
-            <p>All student fee payments are up to date and within scheduled due dates.</p>
+            <i class="bi bi-check-circle" style="color: var(--success); opacity: 1;"></i>
+            <h3>No Overdue Fee Defaulters</h3>
+            <p>All student fee accounts are currently up to date or within scheduled due grace periods.</p>
+            <a href="{{ url_for('fee.index') }}" class="btn btn-outline">Back to Fee Overview</a>
         </div>
         {% endif %}
     </div>

@@ -1,18 +1,25 @@
 {% extends "base.html" %}
 
-{% block title %}Fee Structures - PM SHRI Kendriya Vidyalaya{% endblock %}
-{% block page_title %}Fee Configurations<small>Configure academic sessions, quarterly fees, and components</small>{% endblock %}
+{% block title %}Fee Structures & Heads - Fee Management System{% endblock %}
+{% block page_title %}Fee Structures<small>Configure session components, tuition charges, and quarterly fees</small>{% endblock %}
 
 {% block content %}
 <div class="card">
-    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <h3 class="card-title" style="margin: 0;">Fee Structures</h3>
+    <div class="card-header">
+        <div class="d-flex align-items-center gap-2">
+            <h3 class="card-title">
+                <i class="bi bi-sliders2"></i>
+                <span>Configured Fee Heads & Rules</span>
+            </h3>
+        </div>
         <div style="display: flex; gap: 8px;">
-            <button type="button" class="btn btn-outline-primary" onclick="showGenerateDuesModal()">
-                <i class="bi bi-magic"></i> Generate Batch Dues
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="showGenerateDuesModal()">
+                <i class="bi bi-magic"></i>
+                <span>Generate Batch Dues</span>
             </button>
-            <a href="{{ url_for('fee.add_structure') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i> Add Structure
+            <a href="{{ url_for('fee.add_structure') }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-circle"></i>
+                <span>Add Structure</span>
             </a>
         </div>
     </div>
@@ -38,25 +45,27 @@
                     {% endfor %}
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary"><i class="bi bi-filter"></i> Filter</button>
-            <a href="{{ url_for('fee.list_structures') }}" class="btn btn-outline">Reset</a>
+            <div style="display: flex; gap: 6px;">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-funnel"></i> Filter</button>
+                <a href="{{ url_for('fee.list_structures') }}" class="btn btn-outline">Reset</a>
+            </div>
         </form>
     </div>
 
     <div class="card-body" style="padding: 0;">
         {% if structures %}
         <div class="table-responsive">
-            <table class="table">
+            <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Structure / Component</th>
-                        <th>Session</th>
-                        <th>Batch / Class</th>
+                        <th>Structure / Fee Component</th>
+                        <th>Academic Session</th>
+                        <th>Target Batch</th>
                         <th>Quarter</th>
-                        <th>Amount</th>
-                        <th>Frequency</th>
+                        <th class="text-right">Charge Amount</th>
+                        <th>Billing Frequency</th>
                         <th>Status</th>
-                        <th>Actions</th>
+                        <th style="width: 90px; text-align: center;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -64,24 +73,28 @@
                     <tr id="structure-row-{{ fs.id }}">
                         <td>
                             <strong>{{ fs.name }}</strong>
-                            <br><small class="text-muted">{{ fs.fee_component or 'Fee' }} - {{ fs.description or '' }}</small>
+                            <div style="font-size: 11px; color: var(--text-muted);">
+                                {{ fs.fee_component or 'Fee Head' }} {% if fs.description %}&bull; {{ fs.description }}{% endif %}
+                            </div>
                         </td>
-                        <td><span class="badge badge-secondary">{{ fs.academic_session or 'All' }}</span></td>
+                        <td><span class="badge badge-secondary">{{ fs.academic_session or 'All Sessions' }}</span></td>
                         <td>{{ fs.batch.name if fs.batch else 'All Batches' }}</td>
                         <td>{{ fs.quarter or 'All Quarters' }}</td>
-                        <td class="text-primary"><strong>₹{{ "{:,.2f}".format(fs.amount) }}</strong></td>
+                        <td class="text-right">
+                            <span class="currency-val text-primary">₹{{ "{:,.2f}".format(fs.amount) }}</span>
+                        </td>
                         <td><span class="badge badge-secondary">{{ fs.frequency }}</span></td>
                         <td>
                             <span class="badge badge-{{ 'success' if fs.is_active else 'secondary' }}">
                                 {{ 'Active' if fs.is_active else 'Inactive' }}
                             </span>
                         </td>
-                        <td>
+                        <td style="text-align: center;">
                             <div class="btn-group">
-                                <a href="{{ url_for('fee.edit_structure', id=fs.id) }}" class="btn btn-sm btn-outline">
+                                <a href="{{ url_for('fee.edit_structure', id=fs.id) }}" class="btn btn-sm btn-outline" title="Edit Structure">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-                                <button type="button" class="btn btn-sm btn-outline" style="color: var(--danger);"
+                                <button type="button" class="btn btn-sm btn-outline-danger" title="Delete Structure"
                                     onclick="showDeleteConfirm({{ fs.id }}, '{{ fs.name }}')">
                                     <i class="bi bi-trash"></i>
                                 </button>
@@ -97,17 +110,17 @@
                         <td colspan="8">
                             <div class="confirm-row-content">
                                 <div class="confirm-row-message">
-                                    <i class="bi bi-exclamation-triangle-fill"></i>
-                                    <span>Delete <strong id="confirm-name-{{ fs.id }}">{{ fs.name }}</strong>? If transactions exist, please deactivate instead.</span>
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    <span>Delete structure <strong>{{ fs.name }}</strong>? If transaction history exists, consider deactivating instead.</span>
                                 </div>
-                                <div class="confirm-row-actions">
+                                <div style="display: flex; gap: 8px;">
                                     <button type="button" class="btn btn-sm btn-danger"
                                         onclick="document.getElementById('delete-form-{{ fs.id }}').submit()">
-                                        <i class="bi bi-trash"></i> Delete
+                                        <i class="bi bi-trash"></i> Yes, Delete
                                     </button>
                                     <button type="button" class="btn btn-sm btn-outline"
                                         onclick="hideDeleteConfirm({{ fs.id }})">
-                                        <i class="bi bi-x-lg"></i> Cancel
+                                        Cancel
                                     </button>
                                 </div>
                             </div>
@@ -119,10 +132,12 @@
         </div>
         {% else %}
         <div class="empty-state">
-            <i class="bi bi-gear"></i>
-            <h3>No Fee Structures Found</h3>
-            <p>Create fee structures configured by academic session, quarter, and component.</p>
-            <a href="{{ url_for('fee.add_structure') }}" class="btn btn-primary">Create Structure</a>
+            <i class="bi bi-sliders2"></i>
+            <h3>No Fee Structures Configured</h3>
+            <p>Set up institutional fee heads and rules for tuition, exams, laboratory, and other charges.</p>
+            <a href="{{ url_for('fee.add_structure') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Create First Fee Structure
+            </a>
         </div>
         {% endif %}
     </div>
@@ -130,10 +145,13 @@
 
 <!-- Generate Dues Modal -->
 <div id="generateDuesModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
-    <div style="background: var(--bg-card); padding: 24px; border-radius: 12px; max-width: 480px; width: 90%;">
-        <h4 style="margin-top: 0; color: #1e3a8a;"><i class="bi bi-magic"></i> Generate Quarterly Dues</h4>
-        <p style="font-size: 13px; color: var(--text-muted);">
-            This tool automatically generates Q1–Q4 dues for all active students enrolled in the selected batch based on active fee structures. Existing dues will not be duplicated.
+    <div style="background: var(--bg-card); padding: 24px; border-radius: var(--radius-md); max-width: 480px; width: 90%; border: 1px solid var(--border-color); box-shadow: var(--shadow-lg);">
+        <h4 style="margin-top: 0; color: var(--text-primary); font-size: 15px; display: flex; align-items: center; gap: 8px;">
+            <i class="bi bi-magic text-primary"></i>
+            <span>Generate Quarterly Dues for Batch</span>
+        </h4>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin: 8px 0 16px 0;">
+            This administrative task creates Q1–Q4 assessment dues for all active students in the selected class batch using configured fee structures. Duplicate dues are prevented.
         </p>
         <form method="POST" action="{{ url_for('fee.generate_batch_dues') }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -156,7 +174,9 @@
             </div>
             <div style="display: flex; justify-content: flex-end; gap: 10px;">
                 <button type="button" class="btn btn-outline btn-sm" onclick="hideGenerateDuesModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary btn-sm">Generate Dues</button>
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="bi bi-check2"></i> Generate Dues
+                </button>
             </div>
         </form>
     </div>
