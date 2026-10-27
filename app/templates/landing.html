@@ -29,15 +29,15 @@
                     <span style="background-color: #ffffff;"></span>
                     <span style="background-color: #16a34a;"></span>
                 </span>
-                <span>Ministry of Education, Government of India</span>
-                <span style="opacity: 0.35;">|</span>
-                <span>Kendriya Vidyalaya Sangathan (Bhopal Region)</span>
+                <span class="topbar-lead">Ministry of Education, Govt. of India</span>
+                <span class="topbar-divider" aria-hidden="true">|</span>
+                <span class="topbar-kvs">Kendriya Vidyalaya Sangathan (Bhopal Region)</span>
             </div>
             <div class="govt-topbar-right">
-                <a href="#about">About</a>
-                <a href="#notices">Notices</a>
-                <a href="https://no1itarasi.kvs.ac.in/en/" target="_blank" rel="noopener noreferrer">Official Portal ↗</a>
-                <a href="{{ url_for('auth.login') }}" style="color: #fdba74; font-weight: 600;">Sign In</a>
+                <a href="#about" class="topbar-desktop-only">About</a>
+                <a href="#notices" class="topbar-desktop-only">Notices</a>
+                <a href="https://no1itarasi.kvs.ac.in/en/" target="_blank" rel="noopener noreferrer" class="topbar-portal">Official Portal ↗</a>
+                <a href="{{ url_for('auth.login') }}" class="topbar-signin">Sign In</a>
             </div>
         </div>
     </header>
@@ -46,8 +46,11 @@
     <nav class="site-nav" id="siteNav" aria-label="Main Navigation">
         <div class="editorial-container nav-inner">
             <a href="#top" class="nav-brand" aria-label="PM SHRI Kendriya Vidyalaya No. 1 Itarsi Home">
-                <span class="brand-title">PM SHRI Kendriya Vidyalaya No. 1</span>
-                <span class="brand-subtitle">Ordnance Factory, Itarsi • Estd. 1980</span>
+                <div class="brand-badge-pill" aria-hidden="true">KV1</div>
+                <div class="brand-text-block">
+                    <span class="brand-title">PM SHRI Kendriya Vidyalaya No. 1</span>
+                    <span class="brand-subtitle">Ordnance Factory, Itarsi • Estd. 1980</span>
+                </div>
             </a>
 
             <!-- Desktop Nav Links -->
@@ -64,31 +67,54 @@
 
             <!-- Header Action CTA -->
             <div class="nav-actions">
-                <a href="{{ url_for('auth.login') }}" class="btn-editorial portal-btn">
+                <a href="{{ url_for('auth.login') }}" class="btn-editorial portal-btn" aria-label="Portal Login" title="Sign In to School Portal">
                     <i class="bi bi-person-circle"></i>
-                    <span>Portal Login</span>
+                    <span class="portal-btn-label">Portal Login</span>
                 </a>
-                <button class="mobile-menu-toggle" id="mobileMenuBtn" aria-label="Toggle navigation menu" aria-expanded="false">
-                    <i class="bi bi-list" style="font-size: 1.35rem;"></i>
+                <button class="mobile-menu-toggle" id="mobileMenuBtn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobileDrawer">
+                    <i class="bi bi-list menu-icon-open"></i>
+                    <i class="bi bi-x-lg menu-icon-close" style="display: none;"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Accessible Mobile Drawer -->
-        <div class="mobile-nav-drawer" id="mobileDrawer">
-            <a href="#top" class="nav-link mobile-nav-link">Home</a>
-            <a href="#about" class="nav-link mobile-nav-link">About the Vidyalaya</a>
-            <a href="#academics" class="nav-link mobile-nav-link">Academics</a>
-            <a href="#facilities" class="nav-link mobile-nav-link">Infrastructure & Spaces</a>
-            <a href="#activities" class="nav-link mobile-nav-link">Activities & Initiatives</a>
-            <a href="#achievements" class="nav-link mobile-nav-link">Achievements</a>
-            <a href="#notices" class="nav-link mobile-nav-link">News & Notices</a>
-            <a href="#contact" class="nav-link mobile-nav-link">Contact & Location</a>
-            <div style="padding-top: 1rem; border-top: var(--border-light);">
+        <!-- Accessible Mobile Drawer Overlay Backdrop -->
+        <div class="mobile-nav-backdrop" id="mobileNavBackdrop" aria-hidden="true"></div>
+
+        <!-- Accessible Mobile Navigation Drawer -->
+        <div class="mobile-nav-drawer" id="mobileDrawer" role="dialog" aria-modal="true" aria-label="Mobile Navigation Menu">
+            <div class="mobile-drawer-header">
+                <div class="mobile-drawer-brand">
+                    <span class="brand-badge-pill sm" aria-hidden="true">KV1</span>
+                    <div>
+                        <div class="mobile-drawer-title">PM SHRI KV No. 1</div>
+                        <div class="mobile-drawer-sub">OF Itarsi &bull; Menu</div>
+                    </div>
+                </div>
+                <button class="mobile-drawer-close" id="mobileDrawerClose" aria-label="Close navigation menu">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="mobile-drawer-nav">
+                <a href="#top" class="mobile-nav-link active"><i class="bi bi-house-door"></i><span>Home</span></a>
+                <a href="#about" class="mobile-nav-link"><i class="bi bi-info-circle"></i><span>About the Vidyalaya</span></a>
+                <a href="#academics" class="mobile-nav-link"><i class="bi bi-journal-bookmark"></i><span>Academics & Streams</span></a>
+                <a href="#facilities" class="mobile-nav-link"><i class="bi bi-building"></i><span>Infrastructure & Spaces</span></a>
+                <a href="#activities" class="mobile-nav-link"><i class="bi bi-trophy"></i><span>Activities & Initiatives</span></a>
+                <a href="#achievements" class="mobile-nav-link"><i class="bi bi-award"></i><span>Achievements & Results</span></a>
+                <a href="#notices" class="mobile-nav-link"><i class="bi bi-bell"></i><span>News & Notices</span></a>
+                <a href="#contact" class="mobile-nav-link"><i class="bi bi-geo-alt"></i><span>Contact & Location</span></a>
+            </div>
+
+            <div class="mobile-drawer-footer">
                 <a href="{{ url_for('auth.login') }}" class="btn-editorial primary" style="width: 100%;">
                     <i class="bi bi-lock"></i>
                     <span>Staff & Student Login</span>
                 </a>
+                <div class="mobile-drawer-affil">
+                    <span>CBSE: 1000015</span> &bull; <span>KV Code: 1113</span>
+                </div>
             </div>
         </div>
     </nav>
@@ -740,32 +766,86 @@
             const navbar = document.getElementById('siteNav');
             const mobileBtn = document.getElementById('mobileMenuBtn');
             const mobileDrawer = document.getElementById('mobileDrawer');
+            const mobileBackdrop = document.getElementById('mobileNavBackdrop');
+            const mobileDrawerClose = document.getElementById('mobileDrawerClose');
             const mobileLinks = document.querySelectorAll('.mobile-nav-link');
             const desktopLinks = document.querySelectorAll('.nav-links .nav-link');
+            const openIcon = mobileBtn ? mobileBtn.querySelector('.menu-icon-open') : null;
+            const closeIcon = mobileBtn ? mobileBtn.querySelector('.menu-icon-close') : null;
 
             // Sticky Navbar scroll shadow
             window.addEventListener('scroll', () => {
-                if (window.scrollY > 40) {
+                if (window.scrollY > 30) {
                     navbar.classList.add('scrolled');
                 } else {
                     navbar.classList.remove('scrolled');
                 }
             }, { passive: true });
 
-            // Mobile menu toggle
+            function openMobileMenu() {
+                if (!mobileDrawer) return;
+                mobileDrawer.classList.add('open');
+                if (mobileBackdrop) mobileBackdrop.classList.add('open');
+                if (mobileBtn) {
+                    mobileBtn.setAttribute('aria-expanded', 'true');
+                    mobileBtn.setAttribute('aria-label', 'Close navigation menu');
+                    if (openIcon) openIcon.style.display = 'none';
+                    if (closeIcon) closeIcon.style.display = 'inline-block';
+                }
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeMobileMenu() {
+                if (!mobileDrawer) return;
+                mobileDrawer.classList.remove('open');
+                if (mobileBackdrop) mobileBackdrop.classList.remove('open');
+                if (mobileBtn) {
+                    mobileBtn.setAttribute('aria-expanded', 'false');
+                    mobileBtn.setAttribute('aria-label', 'Open navigation menu');
+                    if (openIcon) openIcon.style.display = 'inline-block';
+                    if (closeIcon) closeIcon.style.display = 'none';
+                }
+                document.body.style.overflow = '';
+            }
+
             if (mobileBtn && mobileDrawer) {
                 mobileBtn.addEventListener('click', () => {
-                    const isOpen = mobileDrawer.classList.toggle('open');
-                    mobileBtn.setAttribute('aria-expanded', isOpen);
-                    mobileBtn.innerHTML = isOpen ? '<i class="bi bi-x-lg" style="font-size: 1.35rem;"></i>' : '<i class="bi bi-list" style="font-size: 1.35rem;"></i>';
+                    const isOpen = mobileDrawer.classList.contains('open');
+                    if (isOpen) {
+                        closeMobileMenu();
+                    } else {
+                        openMobileMenu();
+                    }
                 });
+
+                if (mobileBackdrop) {
+                    mobileBackdrop.addEventListener('click', closeMobileMenu);
+                }
+
+                if (mobileDrawerClose) {
+                    mobileDrawerClose.addEventListener('click', closeMobileMenu);
+                }
 
                 mobileLinks.forEach(link => {
                     link.addEventListener('click', () => {
-                        mobileDrawer.classList.remove('open');
-                        mobileBtn.setAttribute('aria-expanded', 'false');
-                        mobileBtn.innerHTML = '<i class="bi bi-list" style="font-size: 1.35rem;"></i>';
+                        mobileLinks.forEach(l => l.classList.remove('active'));
+                        link.classList.add('active');
+                        closeMobileMenu();
                     });
+                });
+
+                // Close on Escape key
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && mobileDrawer.classList.contains('open')) {
+                        closeMobileMenu();
+                    }
+                });
+
+                // Auto-close on resize to desktop
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth > 768 && mobileDrawer.classList.contains('open')) {
+                        closeMobileMenu();
+                    }
                 });
             }
 
