@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Fees - PM SHRI Kendriya Vidyalaya{% endblock %}
+{% block page_title %}Pending Fees<small>Outstanding quarterly school dues</small>{% endblock %}
+
+{% block content %}
+<!-- Summary Stats Cards -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
+    <div class="card" style="padding: 16px; border-left: 4px solid #3b82f6;">
+        <div style="color: var(--text-muted); font-size: 13px;">Total Assessed Fees</div>
+        <div style="font-size: 24px; font-weight: 700; color: #1e3a8a;">₹{{ "{:,.2f}".format(total_expected) }}</div>
+    </div>
+    <div class="card" style="padding: 16px; border-left: 4px solid #10b981;">
+        <div style="color: var(--text-muted); font-size: 13px;">Total Collected</div>
+        <div style="font-size: 24px; font-weight: 700; color: #059669;">₹{{ "{:,.2f}".format(total_paid) }}</div>
+    </div>
+    <div class="card" style="padding: 16px; border-left: 4px solid #ef4444;">
+        <div style="color: var(--text-muted); font-size: 13px;">Total Outstanding Balance</div>
+        <div style="font-size: 24px; font-weight: 700; color: #dc2626;">₹{{ "{:,.2f}".format(total_pending) }}</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <h3 class="card-title" style="margin: 0;">Pending Dues by Student</h3>
+        <div>
+            <a href="{{ url_for('fee.export_pending_csv', batch_id=selected_batch, academic_session=selected_session, quarter=selected_quarter) }}" class="btn btn-sm btn-outline-success">
+                <i class="bi bi-file-earmark-spreadsheet"></i> Export CSV
+            </a>
+        </div>
+    </div>
+
+    <div class="filter-bar">
+        <form method="GET" style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; width: 100%;">
+            <div class="filter-group" style="flex: 1; min-width: 140px;">
+                <label>Academic Session</label>
+                <select name="academic_session" class="form-control form-select">
+                    <option value="">All Sessions</option>
+                    {% for sess in academic_sessions %}
+                    <option value="{{ sess }}" {{ 'selected' if selected_session == sess }}>{{ sess }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group" style="flex: 1; min-width: 120px;">
+                <label>Quarter</label>
+                <select name="quarter" class="form-control form-select">
+                    <option value="">All Quarters</option>
+                    {% for q in quarters %}
+                    <option value="{{ q }}" {{ 'selected' if selected_quarter == q }}>{{ q }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group" style="flex: 1.5; min-width: 160px;">
+                <label>Class / Batch</label>
+                <select name="batch_id" class="form-control form-select">
+                    <option value="">All Batches</option>
+                    {% for batch in batches %}
+                    <option value="{{ batch.id }}" {{ 'selected' if selected_batch == batch.id }}>{{ batch.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-filter"></i> Filter</button>
+            <a href="{{ url_for('fee.pending_fees') }}" class="btn btn-outline">Reset</a>
+        </form>
+    </div>
+
+    <div class="card-body" style="padding: 0;">
+        {% if pending_list %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th class="hide-mobile">Class / Batch</th>
+                        <th>Pending Quarters</th>
+                        <th class="text-right hide-mobile">Assessed</th>
+                        <th class="text-right hide-mobile">Paid</th>
+                        <th class="text-right">Outstanding</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in pending_list %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('student.view_student', id=item.student.id) }}">
+                                <strong>{{ item.student.full_name }}</strong>
+                            </a>
+                            <br><small class="text-muted">{{ item.student.student_id }}</small>
+                        </td>
+                        <td class="hide-mobile">{{ item.student.batch.name if item.student.batch else '-' }}</td>
+                        <td>
+                            {% for qtr in item.quarters %}
+                            <span class="badge badge-secondary" style="font-size: 11px;">{{ qtr }}</span>
+                            {% endfor %}
+                            {% if item.overdue_count > 0 %}
+                            <span class="badge badge-danger" style="font-size: 11px;">{{ item.overdue_count }} Overdue</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-right hide-mobile">₹{{ "{:,.2f}".format(item.expected) }}</td>
+                        <td class="text-right text-success hide-mobile">₹{{ "{:,.2f}".format(item.paid) }}</td>
+                        <td class="text-right text-danger"><strong>₹{{ "{:,.2f}".format(item.pending) }}</strong></td>
+                        <td>
+                            <a href="{{ url_for('fee.collect_fee', student_id=item.student.id) }}" class="btn btn-sm btn-success">
+                                <i class="bi bi-cash"></i><span class="hide-mobile"> Collect</span>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-check-circle" style="color: #10b981;"></i>
+            <h3>No Pending Fees!</h3>
+            <p>All students are completely up to date with their fees for the selected criteria.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

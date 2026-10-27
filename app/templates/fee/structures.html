@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Fee Structures - PM SHRI Kendriya Vidyalaya{% endblock %}
+{% block page_title %}Fee Configurations<small>Configure academic sessions, quarterly fees, and components</small>{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <h3 class="card-title" style="margin: 0;">Fee Structures</h3>
+        <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-outline-primary" onclick="showGenerateDuesModal()">
+                <i class="bi bi-magic"></i> Generate Batch Dues
+            </button>
+            <a href="{{ url_for('fee.add_structure') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Add Structure
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <form method="GET" style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; width: 100%;">
+            <div class="filter-group" style="flex: 1; min-width: 140px;">
+                <label>Academic Session</label>
+                <select name="academic_session" class="form-control form-select">
+                    <option value="">All Sessions</option>
+                    {% for sess in academic_sessions %}
+                    <option value="{{ sess }}" {{ 'selected' if selected_session == sess }}>{{ sess }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group" style="flex: 1.5; min-width: 160px;">
+                <label>Batch / Class</label>
+                <select name="batch_id" class="form-control form-select">
+                    <option value="">All Batches</option>
+                    {% for batch in batches %}
+                    <option value="{{ batch.id }}" {{ 'selected' if selected_batch == batch.id }}>{{ batch.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-filter"></i> Filter</button>
+            <a href="{{ url_for('fee.list_structures') }}" class="btn btn-outline">Reset</a>
+        </form>
+    </div>
+
+    <div class="card-body" style="padding: 0;">
+        {% if structures %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Structure / Component</th>
+                        <th>Session</th>
+                        <th>Batch / Class</th>
+                        <th>Quarter</th>
+                        <th>Amount</th>
+                        <th>Frequency</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fs in structures %}
+                    <tr id="structure-row-{{ fs.id }}">
+                        <td>
+                            <strong>{{ fs.name }}</strong>
+                            <br><small class="text-muted">{{ fs.fee_component or 'Fee' }} - {{ fs.description or '' }}</small>
+                        </td>
+                        <td><span class="badge badge-secondary">{{ fs.academic_session or 'All' }}</span></td>
+                        <td>{{ fs.batch.name if fs.batch else 'All Batches' }}</td>
+                        <td>{{ fs.quarter or 'All Quarters' }}</td>
+                        <td class="text-primary"><strong>₹{{ "{:,.2f}".format(fs.amount) }}</strong></td>
+                        <td><span class="badge badge-secondary">{{ fs.frequency }}</span></td>
+                        <td>
+                            <span class="badge badge-{{ 'success' if fs.is_active else 'secondary' }}">
+                                {{ 'Active' if fs.is_active else 'Inactive' }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{{ url_for('fee.edit_structure', id=fs.id) }}" class="btn btn-sm btn-outline">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline" style="color: var(--danger);"
+                                    onclick="showDeleteConfirm({{ fs.id }}, '{{ fs.name }}')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                            <form id="delete-form-{{ fs.id }}" action="{{ url_for('fee.delete_structure', id=fs.id) }}"
+                                method="POST" style="display: none;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            </form>
+                        </td>
+                    </tr>
+                    <!-- Confirmation row -->
+                    <tr class="confirm-row" id="confirm-row-{{ fs.id }}">
+                        <td colspan="8">
+                            <div class="confirm-row-content">
+                                <div class="confirm-row-message">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                    <span>Delete <strong id="confirm-name-{{ fs.id }}">{{ fs.name }}</strong>? If transactions exist, please deactivate instead.</span>
+                                </div>
+                                <div class="confirm-row-actions">
+                                    <button type="button" class="btn btn-sm btn-danger"
+                                        onclick="document.getElementById('delete-form-{{ fs.id }}').submit()">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline"
+                                        onclick="hideDeleteConfirm({{ fs.id }})">
+                                        <i class="bi bi-x-lg"></i> Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-gear"></i>
+            <h3>No Fee Structures Found</h3>
+            <p>Create fee structures configured by academic session, quarter, and component.</p>
+            <a href="{{ url_for('fee.add_structure') }}" class="btn btn-primary">Create Structure</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Generate Dues Modal -->
+<div id="generateDuesModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+    <div style="background: var(--bg-card); padding: 24px; border-radius: 12px; max-width: 480px; width: 90%;">
+        <h4 style="margin-top: 0; color: #1e3a8a;"><i class="bi bi-magic"></i> Generate Quarterly Dues</h4>
+        <p style="font-size: 13px; color: var(--text-muted);">
+            This tool automatically generates Q1–Q4 dues for all active students enrolled in the selected batch based on active fee structures. Existing dues will not be duplicated.
+        </p>
+        <form method="POST" action="{{ url_for('fee.generate_batch_dues') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group" style="margin-bottom: 14px;">
+                <label class="form-label">Target Class / Batch <span class="required">*</span></label>
+                <select name="batch_id" class="form-control form-select" required>
+                    <option value="">Select Batch...</option>
+                    {% for batch in batches %}
+                    <option value="{{ batch.id }}">{{ batch.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 18px;">
+                <label class="form-label">Academic Session <span class="required">*</span></label>
+                <select name="academic_session" class="form-control form-select" required>
+                    {% for sess in academic_sessions %}
+                    <option value="{{ sess }}">{{ sess }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-outline btn-sm" onclick="hideGenerateDuesModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-sm">Generate Dues</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function showDeleteConfirm(id, name) {
+        document.querySelectorAll('.confirm-row.show').forEach(row => row.classList.remove('show'));
+        document.getElementById('confirm-row-' + id).classList.add('show');
+    }
+
+    function hideDeleteConfirm(id) {
+        document.getElementById('confirm-row-' + id).classList.remove('show');
+    }
+
+    function showGenerateDuesModal() {
+        document.getElementById('generateDuesModal').style.display = 'flex';
+    }
+
+    function hideGenerateDuesModal() {
+        document.getElementById('generateDuesModal').style.display = 'none';
+    }
+</script>
+{% endblock %}

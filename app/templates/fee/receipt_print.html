@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt #{{ transaction.receipt_number }} - {{ school_name }}</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        body {
+            background: #ffffff;
+            color: #111827;
+            padding: 20px;
+        }
+        .print-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 2px solid #1e3a8a;
+            padding: 30px;
+            border-radius: 8px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #1e3a8a;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            color: #1e3a8a;
+            font-size: 26px;
+            margin-bottom: 4px;
+        }
+        .header p {
+            font-size: 13px;
+            color: #4b5563;
+            margin: 2px 0;
+        }
+        .receipt-badge {
+            display: inline-block;
+            background: #10b981;
+            color: #ffffff;
+            padding: 4px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+        .receipt-badge.reversed {
+            background: #ef4444;
+        }
+        .meta-table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .meta-table td {
+            padding: 6px 10px;
+            vertical-align: top;
+        }
+        .meta-table td.label {
+            color: #6b7280;
+            width: 25%;
+        }
+        .meta-table td.val {
+            font-weight: 600;
+            width: 25%;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .items-table th, .items-table td {
+            border: 1px solid #d1d5db;
+            padding: 10px 14px;
+        }
+        .items-table th {
+            background: #f3f4f6;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .totals-section {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .totals-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        .totals-row.grand {
+            font-size: 17px;
+            font-weight: bold;
+            color: #059669;
+            border-top: 2px solid #d1d5db;
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+        .totals-row.balance {
+            font-size: 14px;
+            font-weight: bold;
+            color: #dc2626;
+            border-top: 1px dashed #d1d5db;
+            padding-top: 6px;
+            margin-top: 6px;
+        }
+        .words-box {
+            font-style: italic;
+            font-size: 13px;
+            color: #4b5563;
+            margin-top: 8px;
+            border-top: 1px dashed #d1d5db;
+            padding-top: 6px;
+        }
+        .footer-signatures {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 50px;
+            padding-top: 10px;
+            font-size: 13px;
+            color: #4b5563;
+        }
+        .sig-line {
+            border-top: 1px solid #9ca3af;
+            width: 200px;
+            text-align: center;
+            padding-top: 4px;
+        }
+        .print-btn-bar {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .btn {
+            background: #1e3a8a;
+            color: #ffffff;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        @media print {
+            .print-btn-bar {
+                display: none !important;
+            }
+            body {
+                padding: 0;
+            }
+            .print-container {
+                border: 1px solid #111827;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="print-btn-bar">
+        <button class="btn" onclick="window.print()">Print Receipt</button>
+        <button class="btn" style="background: #4b5563;" onclick="window.close()">Close Window</button>
+    </div>
+
+    <div class="print-container">
+        <div class="header">
+            <h1>{{ school_name }}</h1>
+            <p>{{ school_tagline }}</p>
+            <p>{{ school_address }} | Phone: {{ school_phone }} | Email: {{ school_email }}</p>
+            <p>Affiliation: {{ school_affiliation }}</p>
+            <div class="receipt-badge {{ 'reversed' if transaction.status == 'REVERSED' else '' }}">
+                {{ 'FEE RECEIPT' if transaction.status != 'REVERSED' else 'REVERSED RECEIPT' }}
+            </div>
+        </div>
+
+        <table class="meta-table">
+            <tr>
+                <td class="label">Receipt No:</td>
+                <td class="val">{{ transaction.receipt_number }}</td>
+                <td class="label">Date:</td>
+                <td class="val">{{ transaction.payment_date.strftime('%d-%m-%Y') }}</td>
+            </tr>
+            <tr>
+                <td class="label">Student Name:</td>
+                <td class="val">{{ student.full_name if student else 'N/A' }}</td>
+                <td class="label">Student ID:</td>
+                <td class="val">{{ student.student_id if student else 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Class / Batch:</td>
+                <td class="val">{{ batch.name if batch else 'N/A' }}</td>
+                <td class="label">Parent / Guardian:</td>
+                <td class="val">{{ student.parent_name if student and student.parent_name else 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Academic Session:</td>
+                <td class="val">{{ transaction.academic_session or 'N/A' }}</td>
+                <td class="label">Quarter:</td>
+                <td class="val">{{ transaction.quarter or 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Payment Mode:</td>
+                <td class="val">{{ transaction.payment_mode.replace('_', ' ').title() }}</td>
+                <td class="label">{{ 'Cheque No:' if transaction.payment_mode == 'CHEQUE' else 'Reference ID:' }}</td>
+                <td class="val">{{ transaction.cheque_number or transaction.transaction_id or 'N/A' }}</td>
+            </tr>
+        </table>
+
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Fee Component</th>
+                    <th>Quarter</th>
+                    <th>Session</th>
+                    <th class="text-right">Allocated Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if allocations and allocations|length > 0 %}
+                    {% for alloc in allocations %}
+                    <tr>
+                        <td><strong>{{ alloc.due.fee_component if alloc.due else transaction.fee_component }}</strong></td>
+                        <td>{{ alloc.due.quarter if alloc.due else transaction.quarter }}</td>
+                        <td>{{ alloc.due.academic_session if alloc.due else transaction.academic_session }}</td>
+                        <td class="text-right">₹{{ "{:,.2f}".format(alloc.amount) }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td><strong>{{ transaction.fee_component or 'Fee Payment' }}</strong></td>
+                        <td>{{ transaction.quarter or 'N/A' }}</td>
+                        <td>{{ transaction.academic_session or 'N/A' }}</td>
+                        <td class="text-right">₹{{ "{:,.2f}".format(transaction.amount) }}</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+
+        <div class="totals-section">
+            <div class="totals-row">
+                <span>Previous Balance:</span>
+                <span>₹{{ "{:,.2f}".format(previous_balance) }}</span>
+            </div>
+            {% if transaction.discount and transaction.discount > 0 %}
+            <div class="totals-row" style="color: #059669;">
+                <span>Discount / Approved Adjustment:</span>
+                <span>-₹{{ "{:,.2f}".format(transaction.discount) }}</span>
+            </div>
+            {% endif %}
+            {% if transaction.fine and transaction.fine > 0 %}
+            <div class="totals-row" style="color: #dc2626;">
+                <span>Fine / Late Fee:</span>
+                <span>+₹{{ "{:,.2f}".format(transaction.fine) }}</span>
+            </div>
+            {% endif %}
+            <div class="totals-row grand">
+                <span>Amount Paid:</span>
+                <span>₹{{ "{:,.2f}".format(transaction.amount) }}</span>
+            </div>
+            <div class="totals-row balance">
+                <span>Remaining Outstanding Balance:</span>
+                <span>₹{{ "{:,.2f}".format(remaining_balance) }}</span>
+            </div>
+            <div class="words-box">
+                <strong>Amount in Words:</strong> {{ amount_in_words }}
+            </div>
+        </div>
+
+        {% if transaction.description %}
+        <p style="font-size: 13px; color: #4b5563; margin-bottom: 20px;">
+            <strong>Remarks:</strong> {{ transaction.description }}
+        </p>
+        {% endif %}
+
+        <div class="footer-signatures">
+            <div>
+                <div>Collector: <strong>{{ transaction.collector.username if transaction.collector else 'Office Cashier' }}</strong></div>
+                <div style="font-size: 11px; margin-top: 4px;">Thank you for your payment!</div>
+            </div>
+            <div class="sig-line">
+                Authorized Signatory
+            </div>
+        </div>
+    </div>
+</body>
+</html>

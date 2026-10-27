@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Add Fee Structure - PM SHRI Kendriya Vidyalaya{% endblock %}
+{% block page_title %}Add Fee Structure<small>Configure session and quarterly fee components</small>{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 680px;">
+    <div class="card-header">
+        <h3 class="card-title">Create Fee Structure</h3>
+    </div>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="card-body">
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Academic Session <span class="required">*</span></label>
+                    <select name="academic_session" class="form-control form-select" required>
+                        {% for sess in academic_sessions %}
+                        <option value="{{ sess }}" {{ 'selected' if sess == current_session }}>{{ sess }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Fee Component <span class="required">*</span></label>
+                    <select name="fee_component" id="fee_component" class="form-control form-select" required onchange="autoFillName()">
+                        {% for comp in fee_components %}
+                        <option value="{{ comp }}" {{ 'selected' if comp == 'Tuition Fee' }}>{{ comp }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Structure Name <span class="required">*</span></label>
+                <input type="text" name="name" id="structure_name" class="form-control" required placeholder="e.g. Class 10 Tuition Fee 2026-27">
+            </div>
+
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Target Batch / Class</label>
+                    <select name="batch_id" id="batch_id" class="form-control form-select" onchange="autoFillName()">
+                        <option value="">Apply to All Batches</option>
+                        {% for batch in batches %}
+                        <option value="{{ batch.id }}">{{ batch.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Specific Quarter (Optional)</label>
+                    <select name="quarter" class="form-control form-select">
+                        <option value="">All Quarters (Q1 - Q4)</option>
+                        {% for q in quarters %}
+                        <option value="{{ q }}">{{ q }}</option>
+                        {% endfor %}
+                    </select>
+                    <p class="form-text">Leave blank to apply across all quarters</p>
+                </div>
+            </div>
+
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Amount (₹) <span class="required">*</span></label>
+                    <input type="number" name="amount" class="form-control" required step="0.01" min="0.01" placeholder="0.00" style="font-size: 16px; font-weight: 600;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Billing Frequency <span class="required">*</span></label>
+                    <select name="frequency" class="form-control form-select" required>
+                        {% for freq in frequencies %}
+                        <option value="{{ freq }}" {{ 'selected' if freq == 'QUARTERLY' }}>{{ freq.replace('_', ' ').title() }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Description / Remarks</label>
+                <textarea name="description" class="form-control" rows="2" placeholder="Fee terms, late payment policy, or component details..."></textarea>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Create Structure</button>
+            <a href="{{ url_for('fee.list_structures') }}" class="btn btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function autoFillName() {
+        const comp = document.getElementById('fee_component').value;
+        const batchSelect = document.getElementById('batch_id');
+        const batchText = batchSelect.selectedIndex > 0 ? batchSelect.options[batchSelect.selectedIndex].text : 'All Batches';
+        const nameInput = document.getElementById('structure_name');
+        if (!nameInput.value || nameInput.getAttribute('data-auto') === 'true') {
+            nameInput.value = `${batchText} - ${comp}`;
+            nameInput.setAttribute('data-auto', 'true');
+        }
+    }
+    document.getElementById('structure_name').addEventListener('input', function() {
+        this.removeAttribute('data-auto');
+    });
+    autoFillName();
+</script>
+{% endblock %}

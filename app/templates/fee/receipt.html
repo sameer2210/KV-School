@@ -1,0 +1,354 @@
+{% extends "base.html" %}
+
+{% block title %}Receipt #{{ transaction.receipt_number }} - {{ school_name }}{% endblock %}
+{% block page_title %}Fee Receipt{% endblock %}
+
+{% block extra_css %}
+<style>
+    .receipt-container {
+        max-width: 720px;
+        margin: 0 auto;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .receipt-header-banner {
+        background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+        color: #ffffff;
+        padding: 24px;
+        text-align: center;
+    }
+
+    .receipt-header-banner h2 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .receipt-header-banner p {
+        margin: 4px 0 0 0;
+        font-size: 13px;
+        opacity: 0.9;
+    }
+
+    .receipt-body {
+        padding: 28px;
+    }
+
+    .receipt-meta-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px 24px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .receipt-meta-item {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .receipt-meta-item .label {
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .receipt-meta-item .val {
+        font-weight: 600;
+        color: var(--text-color);
+    }
+
+    .table-receipt {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    .table-receipt th {
+        background: rgba(0, 0, 0, 0.03);
+        padding: 10px 14px;
+        text-align: left;
+        font-size: 13px;
+        color: var(--text-muted);
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .table-receipt td {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 14px;
+    }
+
+    .receipt-totals-box {
+        background: rgba(16, 185, 129, 0.05);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+    }
+
+    .amount-words {
+        font-style: italic;
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px dashed var(--border-color);
+    }
+
+    .signature-area {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 40px;
+        padding-top: 20px;
+        font-size: 13px;
+        color: var(--text-muted);
+    }
+
+    @media print {
+        header, .sidebar, .btn, .no-print, .filter-bar, footer {
+            display: none !important;
+        }
+        body {
+            background: #ffffff !important;
+            color: #000000 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .receipt-container {
+            border: none !important;
+            box-shadow: none !important;
+            max-width: 100% !important;
+            width: 100% !important;
+        }
+        .receipt-header-banner {
+            background: #ffffff !important;
+            color: #000000 !important;
+            border-bottom: 2px solid #000000 !important;
+            padding: 10px 0 !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="receipt-container">
+    <!-- Action Bar (Hidden on print) -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 24px; border-bottom: 1px solid var(--border-color);" class="no-print">
+        <a href="{{ url_for('fee.list_transactions') }}" class="btn btn-outline btn-sm">
+            <i class="bi bi-arrow-left"></i> All Transactions
+        </a>
+        <div style="display: flex; gap: 8px;">
+            <a href="{{ url_for('fee.print_receipt', id=transaction.id) }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-printer"></i> Printable View
+            </a>
+            <a href="{{ url_for('fee.download_receipt_pdf', id=transaction.id) }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-file-earmark-pdf"></i> Download PDF
+            </a>
+            {% if transaction.status != 'REVERSED' and (current_user.is_admin() or current_user.is_teacher()) %}
+            <button type="button" class="btn btn-outline-danger btn-sm" onclick="showReversalModal()">
+                <i class="bi bi-arrow-counterclockwise"></i> Reverse Payment
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Receipt Header -->
+    <div class="receipt-header-banner">
+        <h2>{{ school_name }}</h2>
+        <p>{{ school_tagline }}</p>
+        <p style="font-size: 12px; margin-top: 2px;">{{ school_address }} | Phone: {{ school_phone }}</p>
+        <p style="font-size: 11px; opacity: 0.8;">Affiliation: {{ school_affiliation }}</p>
+    </div>
+
+    <div class="receipt-body">
+        {% if transaction.status == 'REVERSED' %}
+        <div class="alert alert-danger" style="margin-bottom: 20px; font-weight: 600;">
+            <i class="bi bi-exclamation-triangle-fill"></i> THIS TRANSACTION HAS BEEN REVERSED
+            {% if transaction.reversal_reason %}
+            <div style="font-weight: normal; font-size: 13px; margin-top: 4px;">
+                Reason: {{ transaction.reversal_reason }} (Reversed on {{ transaction.reversed_at.strftime('%d-%m-%Y %H:%M') if transaction.reversed_at else '' }})
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 16px; margin: 0; color: #1e3a8a; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+                Official Fee Receipt
+            </h3>
+            <span class="badge {{ 'badge-success' if transaction.status != 'REVERSED' else 'badge-danger' }}" style="font-size: 13px; padding: 6px 12px;">
+                {{ transaction.status }}
+            </span>
+        </div>
+
+        <!-- Meta Grid -->
+        <div class="receipt-meta-grid">
+            <div class="receipt-meta-item">
+                <span class="label">Receipt No:</span>
+                <span class="val">{{ transaction.receipt_number }}</span>
+            </div>
+            <div class="receipt-meta-item">
+                <span class="label">Payment Date:</span>
+                <span class="val">{{ transaction.payment_date.strftime('%d-%m-%Y') }}</span>
+            </div>
+            <div class="receipt-meta-item">
+                <span class="label">Student Name:</span>
+                <span class="val">{{ student.full_name if student else 'N/A' }}</span>
+            </div>
+            <div class="receipt-meta-item">
+                <span class="label">Student ID:</span>
+                <span class="val">{{ student.student_id if student else 'N/A' }}</span>
+            </div>
+            <div class="receipt-meta-item">
+                <span class="label">Parent / Guardian:</span>
+                <span class="val">{{ student.parent_name if student and student.parent_name else 'N/A' }}</span>
+            </div>
+            <div class="receipt-meta-item">
+                <span class="label">Class / Batch:</span>
+                <span class="val">{{ batch.name if batch else 'N/A' }}</span>
+            </div>
+            <div class="receipt-meta-item">
+                <span class="label">Academic Session:</span>
+                <span class="val">{{ transaction.academic_session or 'N/A' }}</span>
+            </div>
+            <div class="receipt-meta-item">
+                <span class="label">Quarter:</span>
+                <span class="val">{{ transaction.quarter or 'N/A' }}</span>
+            </div>
+            <div class="receipt-meta-item">
+                <span class="label">Payment Mode:</span>
+                <span class="val">{{ transaction.payment_mode.replace('_', ' ').title() }}</span>
+            </div>
+            {% if transaction.transaction_id or transaction.cheque_number %}
+            <div class="receipt-meta-item">
+                <span class="label">{{ 'Cheque No:' if transaction.payment_mode == 'CHEQUE' else 'Ref / Txn ID:' }}</span>
+                <span class="val">{{ transaction.cheque_number or transaction.transaction_id }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Fee Component Allocation Breakdown Table -->
+        <table class="table-receipt">
+            <thead>
+                <tr>
+                    <th>Fee Component</th>
+                    <th>Quarter</th>
+                    <th>Session</th>
+                    <th style="text-align: right;">Allocated Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if allocations and allocations|length > 0 %}
+                    {% for alloc in allocations %}
+                    <tr>
+                        <td><strong>{{ alloc.due.fee_component if alloc.due else transaction.fee_component }}</strong></td>
+                        <td>{{ alloc.due.quarter if alloc.due else transaction.quarter }}</td>
+                        <td>{{ alloc.due.academic_session if alloc.due else transaction.academic_session }}</td>
+                        <td style="text-align: right; font-weight: 600;">₹{{ "{:,.2f}".format(alloc.amount) }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td><strong>{{ transaction.fee_component or 'General Fee' }}</strong></td>
+                        <td>{{ transaction.quarter or 'N/A' }}</td>
+                        <td>{{ transaction.academic_session or 'N/A' }}</td>
+                        <td style="text-align: right; font-weight: 600;">₹{{ "{:,.2f}".format(transaction.amount) }}</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+
+        <!-- Totals & Balances Box -->
+        <div class="receipt-totals-box">
+            <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px;">
+                <span>Previous Outstanding Balance:</span>
+                <span>₹{{ "{:,.2f}".format(previous_balance) }}</span>
+            </div>
+            {% if transaction.discount and transaction.discount > 0 %}
+            <div style="display: flex; justify-content: space-between; font-size: 14px; color: var(--success); margin-bottom: 6px;">
+                <span>Discount / Approved Adjustment:</span>
+                <span>-₹{{ "{:,.2f}".format(transaction.discount) }}</span>
+            </div>
+            {% endif %}
+            {% if transaction.fine and transaction.fine > 0 %}
+            <div style="display: flex; justify-content: space-between; font-size: 14px; color: var(--danger); margin-bottom: 6px;">
+                <span>Fine / Late Charge:</span>
+                <span>+₹{{ "{:,.2f}".format(transaction.fine) }}</span>
+            </div>
+            {% endif %}
+            <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 700; color: #059669; border-top: 1px solid rgba(0,0,0,0.08); padding-top: 8px;">
+                <span>Total Amount Paid:</span>
+                <span>₹{{ "{:,.2f}".format(transaction.amount) }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; color: #dc2626; margin-top: 8px; border-top: 1px solid rgba(0,0,0,0.08); padding-top: 8px;">
+                <span>Remaining Balance Due:</span>
+                <span>₹{{ "{:,.2f}".format(remaining_balance) }}</span>
+            </div>
+
+            <!-- Amount in Words -->
+            <div class="amount-words">
+                <strong>Amount in Words:</strong> {{ amount_in_words }}
+            </div>
+        </div>
+
+        {% if transaction.description %}
+        <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">
+            <strong>Remarks / Notes:</strong> {{ transaction.description }}
+        </div>
+        {% endif %}
+
+        <!-- Signatures & Footer -->
+        <div class="signature-area">
+            <div>
+                <div>Collected By: <strong>{{ transaction.collector.username if transaction.collector else 'Cashier' }}</strong></div>
+                <div style="font-size: 11px; margin-top: 4px;">Computer-generated official receipt.</div>
+            </div>
+            <div style="text-align: center;">
+                <div style="height: 35px;"></div>
+                <div style="border-top: 1px solid #9ca3af; width: 180px; padding-top: 4px;">
+                    Authorized Signature
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reversal Modal / Dialog -->
+<div id="reversalModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+    <div style="background: var(--bg-card); padding: 24px; border-radius: 12px; max-width: 480px; width: 90%;">
+        <h4 style="margin-top: 0; color: #dc2626;"><i class="bi bi-arrow-counterclockwise"></i> Confirm Payment Reversal</h4>
+        <p style="font-size: 14px; color: var(--text-muted);">
+            Reversing this transaction will restore the balance on all associated dues and mark receipt #{{ transaction.receipt_number }} as REVERSED.
+        </p>
+        <form method="POST" action="{{ url_for('fee.reverse_payment', id=transaction.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group" style="margin-bottom: 16px;">
+                <label class="form-label" style="font-size: 13px;">Reason for Reversal <span class="required">*</span></label>
+                <textarea name="reason" class="form-control" rows="3" placeholder="State clear administrative reason for refund/reversal..." required></textarea>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-outline btn-sm" onclick="hideReversalModal()">Cancel</button>
+                <button type="submit" class="btn btn-danger btn-sm">Confirm Reversal</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function showReversalModal() {
+        document.getElementById('reversalModal').style.display = 'flex';
+    }
+    function hideReversalModal() {
+        document.getElementById('reversalModal').style.display = 'none';
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Edit Fee Structure - PM SHRI Kendriya Vidyalaya{% endblock %}
+{% block page_title %}Edit Fee Structure{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 680px;">
+    <div class="card-header">
+        <h3 class="card-title">Edit {{ structure.name }}</h3>
+    </div>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="card-body">
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Academic Session <span class="required">*</span></label>
+                    <select name="academic_session" class="form-control form-select" required>
+                        {% for sess in academic_sessions %}
+                        <option value="{{ sess }}" {{ 'selected' if structure.academic_session == sess }}>{{ sess }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Fee Component <span class="required">*</span></label>
+                    <select name="fee_component" class="form-control form-select" required>
+                        {% for comp in fee_components %}
+                        <option value="{{ comp }}" {{ 'selected' if structure.fee_component == comp }}>{{ comp }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Structure Name <span class="required">*</span></label>
+                <input type="text" name="name" class="form-control" required value="{{ structure.name }}">
+            </div>
+
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Target Batch / Class</label>
+                    <select name="batch_id" class="form-control form-select">
+                        <option value="">Apply to All Batches</option>
+                        {% for batch in batches %}
+                        <option value="{{ batch.id }}" {{ 'selected' if structure.batch_id == batch.id }}>{{ batch.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Specific Quarter</label>
+                    <select name="quarter" class="form-control form-select">
+                        <option value="">All Quarters (Q1 - Q4)</option>
+                        {% for q in quarters %}
+                        <option value="{{ q }}" {{ 'selected' if structure.quarter == q }}>{{ q }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Amount (₹) <span class="required">*</span></label>
+                    <input type="number" name="amount" class="form-control" required step="0.01" min="0.01" value="{{ structure.amount }}" style="font-size: 16px; font-weight: 600;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Frequency <span class="required">*</span></label>
+                    <select name="frequency" class="form-control form-select" required>
+                        {% for freq in frequencies %}
+                        <option value="{{ freq }}" {{ 'selected' if structure.frequency == freq }}>{{ freq.replace('_', ' ').title() }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-control" rows="2">{{ structure.description or '' }}</textarea>
+            </div>
+
+            <div class="form-check" style="margin-top: 10px;">
+                <input type="checkbox" name="is_active" id="is_active" class="form-check-input" {{ 'checked' if structure.is_active }}>
+                <label for="is_active" class="form-check-label">Active Structure</label>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save Changes</button>
+            <a href="{{ url_for('fee.list_structures') }}" class="btn btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,354 @@
+{% extends "base.html" %}
+
+{% block title %}Collect Fee - PM SHRI Kendriya Vidyalaya{% endblock %}
+{% block page_title %}Collect Fee<small>Record quarterly fee payments and allocations</small>{% endblock %}
+
+{% block content %}
+<form method="POST" data-validate id="collectFeeForm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+        <!-- Summary Card -->
+        <div class="card"
+            style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), transparent); border-color: rgba(16, 185, 129, 0.2);">
+            <div class="card-body" style="text-align: center; padding: 24px;">
+                <div style="color: var(--text-muted); margin-bottom: 8px; font-size: 14px;">Amount to Collect</div>
+                <div style="font-size: 40px; font-weight: 700; color: var(--success);">
+                    ₹<span id="summary_amount">0.00</span>
+                </div>
+                <div id="student_balance_pill" style="display: none; margin-top: 8px;">
+                    <span class="badge badge-warning" style="font-size: 13px; padding: 6px 12px;">
+                        Total Outstanding: <strong id="student_total_pending">₹0.00</strong>
+                    </span>
+                </div>
+                <button type="submit" class="btn btn-success" style="margin-top: 16px; width: 100%; max-width: 320px;">
+                    <i class="bi bi-check-lg"></i> Collect & Generate Receipt
+                </button>
+            </div>
+        </div>
+
+        <!-- Student Selection -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="bi bi-person"></i> Select Student</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label">Search Student by Name or ID <span class="required">*</span></label>
+                    <input type="text" class="form-control" placeholder="Type student name or ID..."
+                        data-student-search="#student_id"
+                        value="{{ selected_student.full_name if selected_student else '' }}" required>
+                    <input type="hidden" name="student_id" id="student_id"
+                        value="{{ selected_student.id if selected_student else '' }}" required>
+                    <p class="form-text">Start typing student name, student ID, parent name, or mobile number</p>
+                </div>
+
+                <div id="student_details_box" style="display: {{ 'block' if selected_student else 'none' }}; margin-top: 15px; padding: 12px 16px; background: rgba(0, 0, 0, 0.03); border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <strong id="disp_student_name">{{ selected_student.full_name if selected_student else '' }}</strong>
+                            (<span id="disp_student_id">{{ selected_student.student_id if selected_student else '' }}</span>)
+                            <div style="color: var(--text-muted); font-size: 13px;" id="disp_student_batch">
+                                Class / Batch: {{ selected_student.batch.name if selected_student and selected_student.batch else 'None' }}
+                            </div>
+                        </div>
+                        <div id="disp_parent_info" style="font-size: 13px; color: var(--text-muted); text-align: right;">
+                            <div>Guardian: <span id="disp_parent_name">{{ selected_student.parent_name if selected_student else '-' }}</span></div>
+                            <div>Phone: <span id="disp_parent_phone">{{ selected_student.parent_phone if selected_student else '-' }}</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Outstanding Dues Table Container -->
+                <div id="student_dues_container" style="display: none; margin-top: 20px;">
+                    <h4 style="font-size: 15px; margin-bottom: 10px; color: var(--text-color);">
+                        <i class="bi bi-clock-history"></i> Outstanding Dues for Student
+                    </h4>
+                    <div class="table-responsive">
+                        <table class="table" style="font-size: 13px;">
+                            <thead>
+                                <tr>
+                                    <th>Session</th>
+                                    <th>Quarter</th>
+                                    <th>Component</th>
+                                    <th>Due Date</th>
+                                    <th class="text-right">Net Due</th>
+                                    <th class="text-right">Paid</th>
+                                    <th class="text-right">Pending</th>
+                                    <th>Status</th>
+                                    <th>Select</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dues_tbody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Session & Quarter Selection -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="bi bi-calendar3"></i> Academic Context & Fee Details</h3>
+            </div>
+            <div class="card-body">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px;">
+                    <div class="form-group">
+                        <label class="form-label">Academic Session <span class="required">*</span></label>
+                        <select name="academic_session" id="academic_session" class="form-control form-select">
+                            {% for sess in academic_sessions %}
+                            <option value="{{ sess }}" {{ 'selected' if sess == current_session }}>{{ sess }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Quarter</label>
+                        <select name="quarter" id="quarter_select" class="form-control form-select">
+                            <option value="">Auto-allocate across oldest dues</option>
+                            {% for q in quarters %}
+                            <option value="{{ q }}" {{ 'selected' if q == current_quarter }}>{{ quarter_details[q]['name'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Fee Component</label>
+                        <select name="fee_component" id="fee_component_select" class="form-control form-select">
+                            {% for comp in fee_components %}
+                            <option value="{{ comp }}" {{ 'selected' if comp == 'Tuition Fee' }}>{{ comp }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <input type="hidden" name="fee_due_id" id="selected_fee_due_id" value="">
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px;">
+                    <div class="form-group">
+                        <label class="form-label">Amount (₹) <span class="required">*</span></label>
+                        <input type="number" name="amount" id="amount_input" class="form-control" placeholder="0.00"
+                            step="0.01" min="0.01" required style="font-size: 18px; font-weight: 600;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Payment Date</label>
+                        <input type="date" name="payment_date" class="form-control" data-default-today>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px;">
+                    <div class="form-group">
+                        <label class="form-label">Discount / Adjustment (₹)</label>
+                        <input type="number" name="discount" class="form-control" placeholder="0.00" step="0.01" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fine / Late Fee (₹)</label>
+                        <input type="number" name="fine" class="form-control" placeholder="0.00" step="0.01" min="0" value="0">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description / Remarks</label>
+                    <input type="text" name="description" class="form-control" placeholder="Quarterly fee notes or reference...">
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Mode -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="bi bi-credit-card"></i> Payment Mode</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label">Mode</label>
+                    <select name="payment_mode" id="payment_mode" class="form-control form-select"
+                        onchange="togglePaymentFields()">
+                        {% for mode in payment_modes %}
+                        <option value="{{ mode }}">{{ mode.replace('_', ' ').title() }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Cheque Details -->
+                <div id="cheque_fields" style="display: none;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px;">
+                        <div class="form-group">
+                            <label class="form-label">Cheque Number</label>
+                            <input type="text" name="cheque_number" class="form-control" placeholder="e.g. 004521">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Cheque Date</label>
+                            <input type="date" name="cheque_date" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Bank Name</label>
+                            <input type="text" name="bank_name" class="form-control" placeholder="e.g. State Bank of India">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Online Transaction ID -->
+                <div id="online_fields" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Transaction / UPI Reference ID</label>
+                        <input type="text" name="transaction_id" class="form-control"
+                            placeholder="e.g. UPI/402891289127 or NEFT Ref">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="text-align: center; padding-bottom: 20px; display: flex; gap: 12px; justify-content: center;">
+            <button type="submit" class="btn btn-success" style="padding: 10px 24px;">
+                <i class="bi bi-check2-circle"></i> Confirm Payment & Issue Receipt
+            </button>
+            <a href="{{ url_for('fee.index') }}" class="btn btn-outline" style="padding: 10px 20px;">Cancel</a>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function togglePaymentFields() {
+        const mode = document.getElementById('payment_mode').value;
+        document.getElementById('cheque_fields').style.display = mode === 'CHEQUE' ? 'block' : 'none';
+        document.getElementById('online_fields').style.display = ['UPI', 'BANK_TRANSFER', 'CARD'].includes(mode) ? 'block' : 'none';
+    }
+
+    // Update summary amount dynamically
+    const amountInput = document.getElementById('amount_input');
+    if (amountInput) {
+        amountInput.addEventListener('input', function () {
+            document.getElementById('summary_amount').textContent = parseFloat(this.value || 0).toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        });
+    }
+
+    const studentIdInput = document.getElementById('student_id');
+    if (studentIdInput) {
+        studentIdInput.addEventListener('change', function () {
+            if (this.value) {
+                fetchStudentFeeDetails(this.value);
+            }
+        });
+
+        if (studentIdInput.value) {
+            fetchStudentFeeDetails(studentIdInput.value);
+        }
+    }
+
+    const sessionSelect = document.getElementById('academic_session');
+    if (sessionSelect) {
+        sessionSelect.addEventListener('change', function() {
+            if (studentIdInput && studentIdInput.value) {
+                fetchStudentFeeDetails(studentIdInput.value);
+            }
+        });
+    }
+
+    async function fetchStudentFeeDetails(studentId) {
+        const session = sessionSelect ? sessionSelect.value : '';
+        try {
+            document.body.style.cursor = 'wait';
+            const response = await fetch(`/fees/student-details/${studentId}?session=${encodeURIComponent(session)}`);
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                const s = data.student;
+                const sum = data.summary;
+
+                // Show details box
+                document.getElementById('student_details_box').style.display = 'block';
+                document.getElementById('disp_student_name').textContent = s.name;
+                document.getElementById('disp_student_id').textContent = s.student_id;
+                document.getElementById('disp_student_batch').textContent = `Class / Batch: ${s.batch_name}`;
+                document.getElementById('disp_parent_name').textContent = s.parent_name || '-';
+                document.getElementById('disp_parent_phone').textContent = s.parent_phone || '-';
+
+                // Update balance pill
+                const pill = document.getElementById('student_balance_pill');
+                pill.style.display = 'inline-block';
+                document.getElementById('student_total_pending').textContent = `₹${sum.outstanding_balance.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+
+                // Populate Dues Table
+                const tbody = document.getElementById('dues_tbody');
+                tbody.innerHTML = '';
+
+                if (data.dues && data.dues.length > 0) {
+                    document.getElementById('student_dues_container').style.display = 'block';
+                    data.dues.forEach(d => {
+                        const tr = document.createElement('tr');
+                        const isPending = d.pending > 0;
+                        const statusBadge = d.status === 'PAID' ? 'badge-success' : (d.status === 'PARTIAL' ? 'badge-warning' : (d.is_overdue ? 'badge-danger' : 'badge-secondary'));
+
+                        tr.innerHTML = `
+                            <td>${d.academic_session}</td>
+                            <td><strong>${d.quarter}</strong></td>
+                            <td>${d.fee_component}</td>
+                            <td>${d.due_date}</td>
+                            <td class="text-right">₹${d.net_due.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                            <td class="text-right text-success">₹${d.paid.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                            <td class="text-right ${isPending ? 'text-danger font-weight-bold' : ''}">₹${d.pending.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                            <td><span class="badge ${statusBadge}">${d.status}</span></td>
+                            <td>
+                                ${isPending ? `<button type="button" class="btn btn-sm btn-outline-primary select-due-btn"
+                                    data-id="${d.id}" data-amount="${d.pending}" data-quarter="${d.quarter}" data-component="${d.fee_component}">
+                                    Pay This
+                                </button>` : '<span class="text-muted"><i class="bi bi-check2"></i></span>'}
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+
+                    // Attach click handlers to "Pay This" buttons
+                    document.querySelectorAll('.select-due-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const dueId = this.getAttribute('data-id');
+                            const pendingAmt = this.getAttribute('data-amount');
+                            const qtr = this.getAttribute('data-quarter');
+                            const comp = this.getAttribute('data-component');
+
+                            document.getElementById('selected_fee_due_id').value = dueId;
+                            if (amountInput) {
+                                amountInput.value = pendingAmt;
+                                amountInput.dispatchEvent(new Event('input'));
+                            }
+                            if (qtr) {
+                                const qSelect = document.getElementById('quarter_select');
+                                if (qSelect) qSelect.value = qtr;
+                            }
+                            if (comp) {
+                                const cSelect = document.getElementById('fee_component_select');
+                                if (cSelect) cSelect.value = comp;
+                            }
+                        });
+                    });
+
+                    // Auto-fill amount with oldest pending due amount if amount input is empty or 0
+                    const pendingDue = data.dues.find(d => d.pending > 0);
+                    if (pendingDue && (!amountInput.value || parseFloat(amountInput.value) === 0)) {
+                        amountInput.value = pendingDue.pending;
+                        amountInput.dispatchEvent(new Event('input'));
+                        document.getElementById('selected_fee_due_id').value = pendingDue.id;
+                        if (pendingDue.quarter) {
+                            document.getElementById('quarter_select').value = pendingDue.quarter;
+                        }
+                    }
+                } else {
+                    document.getElementById('student_dues_container').style.display = 'none';
+                }
+            }
+        } catch (err) {
+            console.error('Error fetching student fee details:', err);
+        } finally {
+            document.body.style.cursor = 'default';
+        }
+    }
+</script>
+{% endblock %}

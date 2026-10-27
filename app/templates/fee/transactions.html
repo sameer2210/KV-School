@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Fee Transactions - PM SHRI Kendriya Vidyalaya{% endblock %}
+{% block page_title %}Fee Transactions<small>Searchable payment ledger and audit records</small>{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <h3 class="card-title" style="margin: 0;">Payment Transactions</h3>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="badge badge-primary" style="font-size: 14px; padding: 6px 12px;">
+                Total Collection: ₹{{ "{:,.2f}".format(total_amount) }}
+            </span>
+            <span class="badge badge-secondary" style="font-size: 13px;">{{ total_count }} records</span>
+            <a href="{{ url_for('fee.export_transactions_csv', search=selected_search, academic_session=selected_session, quarter=selected_quarter, payment_mode=selected_mode, status=selected_status) }}" class="btn btn-sm btn-outline-success">
+                <i class="bi bi-file-earmark-spreadsheet"></i> Export CSV
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <form method="GET" style="display: flex; gap: 10px; width: 100%; align-items: flex-end; flex-wrap: wrap;">
+            <div class="filter-group" style="flex: 1.5; min-width: 160px;">
+                <label>Search Student or Receipt #</label>
+                <input type="text" name="search" class="form-control" placeholder="Name, ID, or REC..." value="{{ selected_search or '' }}">
+            </div>
+            <div class="filter-group" style="flex: 1; min-width: 120px;">
+                <label>Session</label>
+                <select name="academic_session" class="form-control form-select">
+                    <option value="">All Sessions</option>
+                    {% for sess in academic_sessions %}
+                    <option value="{{ sess }}" {{ 'selected' if selected_session == sess }}>{{ sess }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group" style="flex: 1; min-width: 100px;">
+                <label>Quarter</label>
+                <select name="quarter" class="form-control form-select">
+                    <option value="">All Quarters</option>
+                    {% for q in quarters %}
+                    <option value="{{ q }}" {{ 'selected' if selected_quarter == q }}>{{ q }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group" style="flex: 1; min-width: 110px;">
+                <label>Payment Mode</label>
+                <select name="payment_mode" class="form-control form-select">
+                    <option value="">All Modes</option>
+                    {% for mode in payment_modes %}
+                    <option value="{{ mode }}" {{ 'selected' if selected_mode == mode }}>{{ mode.replace('_', ' ').title() }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group" style="flex: 1; min-width: 100px;">
+                <label>Status</label>
+                <select name="status" class="form-control form-select">
+                    <option value="">All Statuses</option>
+                    <option value="SUCCESS" {{ 'selected' if selected_status == 'SUCCESS' }}>Success</option>
+                    <option value="REVERSED" {{ 'selected' if selected_status == 'REVERSED' }}>Reversed</option>
+                </select>
+            </div>
+            <div class="filter-group" style="flex: 1; min-width: 120px;">
+                <label>Start Date</label>
+                <input type="date" name="start_date" class="form-control" value="{{ request.args.get('start_date', '') }}">
+            </div>
+            <div class="filter-group" style="flex: 1; min-width: 120px;">
+                <label>End Date</label>
+                <input type="date" name="end_date" class="form-control" value="{{ request.args.get('end_date', '') }}">
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-filter"></i> Filter</button>
+            <a href="{{ url_for('fee.list_transactions') }}" class="btn btn-outline">Reset</a>
+        </form>
+    </div>
+
+    <div class="card-body" style="padding: 0;">
+        {% if transactions.items %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Receipt #</th>
+                        <th>Student</th>
+                        <th>Session / Quarter</th>
+                        <th>Component</th>
+                        <th>Amount</th>
+                        <th class="hide-mobile">Mode</th>
+                        <th class="hide-mobile">Date</th>
+                        <th>Status</th>
+                        <th class="hide-mobile">Collector</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for txn in transactions.items %}
+                    <tr style="{{ 'opacity: 0.6; text-decoration: line-through;' if txn.status == 'REVERSED' else '' }}">
+                        <td>
+                            <a href="{{ url_for('fee.view_receipt', id=txn.id) }}">
+                                <strong>{{ txn.receipt_number }}</strong>
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('student.view_student', id=txn.student_id) }}">
+                                {{ txn.student.full_name if txn.student else 'N/A' }}
+                            </a>
+                            <br><small class="text-muted">{{ txn.student.student_id if txn.student else '' }}</small>
+                        </td>
+                        <td>
+                            {{ txn.academic_session or '-' }}
+                            {% if txn.quarter %}
+                            <span class="badge badge-secondary" style="font-size: 11px;">{{ txn.quarter }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ txn.fee_component or 'Fee' }}</td>
+                        <td class="{{ 'text-success' if txn.status != 'REVERSED' else 'text-muted' }}">
+                            <strong>₹{{ "{:,.2f}".format(txn.amount) }}</strong>
+                        </td>
+                        <td class="hide-mobile"><span class="badge badge-secondary">{{ txn.payment_mode }}</span></td>
+                        <td class="hide-mobile">{{ txn.payment_date.strftime('%d-%m-%Y') }}</td>
+                        <td>
+                            <span class="badge {{ 'badge-success' if txn.status != 'REVERSED' else 'badge-danger' }}">
+                                {{ txn.status }}
+                            </span>
+                        </td>
+                        <td class="hide-mobile">{{ txn.collector.username if txn.collector else '-' }}</td>
+                        <td>
+                            <a href="{{ url_for('fee.view_receipt', id=txn.id) }}" class="btn btn-sm btn-outline" title="View Receipt">
+                                <i class="bi bi-receipt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if transactions.pages > 1 %}
+        <div class="card-footer" style="display: flex; justify-content: center;">
+            <ul class="pagination">
+                {% if transactions.has_prev %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('fee.list_transactions', page=transactions.prev_num, search=selected_search, academic_session=selected_session, quarter=selected_quarter, payment_mode=selected_mode, status=selected_status) }}"><i class="bi bi-chevron-left"></i></a></li>
+                {% endif %}
+                {% for p in transactions.iter_pages() %}
+                {% if p %}
+                <li class="page-item {{ 'active' if p == transactions.page }}"><a class="page-link" href="{{ url_for('fee.list_transactions', page=p, search=selected_search, academic_session=selected_session, quarter=selected_quarter, payment_mode=selected_mode, status=selected_status) }}">{{ p }}</a></li>
+                {% endif %}
+                {% endfor %}
+                {% if transactions.has_next %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('fee.list_transactions', page=transactions.next_num, search=selected_search, academic_session=selected_session, quarter=selected_quarter, payment_mode=selected_mode, status=selected_status) }}"><i class="bi bi-chevron-right"></i></a></li>
+                {% endif %}
+            </ul>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-receipt"></i>
+            <h3>No Transactions Found</h3>
+            <p>Try adjusting your search criteria or date filters.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

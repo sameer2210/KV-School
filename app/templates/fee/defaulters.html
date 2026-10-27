@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Fee Defaulters - PM SHRI Kendriya Vidyalaya{% endblock %}
+{% block page_title %}Fee Defaulters<small>Students with overdue fee payments</small>{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <h3 class="card-title" style="margin: 0;">Overdue Fee Dues</h3>
+        <span class="badge badge-danger" style="font-size: 14px; padding: 6px 12px;">
+            Total Overdue: ₹{{ "{:,.2f}".format(total_overdue_amount) }}
+        </span>
+    </div>
+    <div class="card-body" style="padding: 0;">
+        {% if overdue %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Class / Batch</th>
+                        <th>Session / Quarter</th>
+                        <th>Component</th>
+                        <th class="text-right">Pending Due</th>
+                        <th>Due Date</th>
+                        <th>Days Overdue</th>
+                        <th>Parent Contact</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for due in overdue %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('student.view_student', id=due.student_id) }}">
+                                <strong>{{ due.student.full_name }}</strong>
+                            </a>
+                            <br><small class="text-muted">{{ due.student.student_id }}</small>
+                        </td>
+                        <td>{{ due.student.batch.name if due.student.batch else '-' }}</td>
+                        <td>
+                            {{ due.academic_session or '-' }}
+                            {% if due.quarter %}
+                            <span class="badge badge-secondary" style="font-size: 11px;">{{ due.quarter }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ due.fee_component or 'Tuition Fee' }}</td>
+                        <td class="text-right text-danger">
+                            <strong>₹{{ "{:,.2f}".format(due.pending_amount) }}</strong>
+                        </td>
+                        <td>{{ due.due_date.strftime('%d-%m-%Y') }}</td>
+                        <td>
+                            <span class="badge badge-danger">
+                                {{ (today - due.due_date).days }} days
+                            </span>
+                        </td>
+                        <td>
+                            {{ due.student.parent_phone or '-' }}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('fee.collect_fee', student_id=due.student_id) }}" class="btn btn-sm btn-success">
+                                <i class="bi bi-cash"></i> Collect
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-emoji-smile" style="color: #10b981;"></i>
+            <h3>No Defaulters!</h3>
+            <p>All student fee payments are up to date and within scheduled due dates.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

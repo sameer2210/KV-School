@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Fee Report - PM SHRI Kendriya Vidyalaya{% endblock %}
+{% block page_title %}Fee Collection & Financial Reports<small>Comprehensive analytical reports and exports</small>{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <h3 class="card-title" style="margin: 0;">Fee Collection Report</h3>
+        <div style="display: flex; gap: 8px;">
+            <a href="{{ url_for('fee.export_report_csv', month=month, year=year) }}" class="btn btn-sm btn-outline-success">
+                <i class="bi bi-file-earmark-spreadsheet"></i> Export CSV
+            </a>
+            <a href="{{ url_for('fee.export_report_excel', month=month, year=year) }}" class="btn btn-sm btn-success">
+                <i class="bi bi-file-earmark-excel"></i> Export Excel
+            </a>
+        </div>
+    </div>
+
+    <div class="filter-bar">
+        <form method="GET" style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; width: 100%;">
+            <div class="filter-group" style="flex: 1; min-width: 140px;">
+                <label>Month</label>
+                <select name="month" class="form-control form-select">
+                    {% for m, name in months %}
+                    <option value="{{ m }}" {{ 'selected' if month == m }}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group" style="flex: 1; min-width: 120px;">
+                <label>Year</label>
+                <input type="number" name="year" class="form-control" value="{{ year }}" min="2020" max="2035">
+            </div>
+            <div class="filter-group" style="flex: 1; min-width: 140px;">
+                <label>Academic Session</label>
+                <select name="academic_session" class="form-control form-select">
+                    <option value="">All Sessions</option>
+                    {% for sess in academic_sessions %}
+                    <option value="{{ sess }}" {{ 'selected' if selected_session == sess }}>{{ sess }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-graph-up"></i> Generate Report</button>
+        </form>
+    </div>
+
+    <div class="card-body">
+        <div class="stat-cards" style="margin-bottom: 24px;">
+            <div class="stat-card">
+                <div class="stat-icon success"><i class="bi bi-cash-stack"></i></div>
+                <div class="stat-info">
+                    <h3>₹{{ "{:,.2f}".format(total) }}</h3>
+                    <p>Total Month Collection ({{ months[month-1][1] }} {{ year }})</p>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 24px;">
+            <!-- Quarter-wise Breakdown -->
+            <div class="card" style="box-shadow: none; border: 1px solid var(--border-color);">
+                <div class="card-header" style="background: rgba(0,0,0,0.02);">
+                    <h4 style="margin: 0; font-size: 15px;"><i class="bi bi-pie-chart"></i> Quarter-wise Collections (Session {{ current_session }})</h4>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <table class="table" style="margin: 0; font-size: 13px;">
+                        <thead>
+                            <tr>
+                                <th>Quarter</th>
+                                <th>Txn Count</th>
+                                <th class="text-right">Collection</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if quarter_breakdown %}
+                                {% for qtr, amt, cnt in quarter_breakdown %}
+                                <tr>
+                                    <td><strong>{{ qtr or 'One-Time / Other' }}</strong></td>
+                                    <td>{{ cnt }}</td>
+                                    <td class="text-right text-success"><strong>₹{{ "{:,.2f}".format(amt) }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted" style="padding: 16px;">No transactions recorded for this session.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Fee Component Breakdown -->
+            <div class="card" style="box-shadow: none; border: 1px solid var(--border-color);">
+                <div class="card-header" style="background: rgba(0,0,0,0.02);">
+                    <h4 style="margin: 0; font-size: 15px;"><i class="bi bi-tags"></i> Fee Component Breakdown</h4>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <table class="table" style="margin: 0; font-size: 13px;">
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Count</th>
+                                <th class="text-right">Total (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if component_breakdown %}
+                                {% for comp, amt, cnt in component_breakdown %}
+                                <tr>
+                                    <td><strong>{{ comp or 'General' }}</strong></td>
+                                    <td>{{ cnt }}</td>
+                                    <td class="text-right text-success"><strong>₹{{ "{:,.2f}".format(amt) }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted" style="padding: 16px;">No component collections found.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Mode Breakdown -->
+        {% if mode_breakdown %}
+        <h4 class="mt-4 mb-3" style="font-size: 15px;"><i class="bi bi-credit-card"></i> Payment Mode Breakdown ({{ months[month-1][1] }} {{ year }})</h4>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Payment Mode</th>
+                        <th>Transactions Count</th>
+                        <th class="text-right">Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mode, amount, count in mode_breakdown %}
+                    <tr>
+                        <td><span class="badge badge-secondary">{{ mode.replace('_', ' ').title() }}</span></td>
+                        <td>{{ count }}</td>
+                        <td class="text-right text-success"><strong>₹{{ "{:,.2f}".format(amount) }}</strong></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        <!-- Daily Trend Chart -->
+        {% if daily_collection %}
+        <h4 class="mt-4 mb-3" style="font-size: 15px;"><i class="bi bi-calendar-event"></i> Daily Collection Trend</h4>
+        <div class="chart-container" style="height: 300px;">
+            <canvas id="dailyChart"></canvas>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    {% if daily_collection %}
+    const ctx = document.getElementById('dailyChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{% for date, total in daily_collection %}'{{ date.strftime("%d %b") }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Collection (₹)',
+                data: [{% for date, total in daily_collection %}{{ total }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: '#10b981'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+    {% endif %}
+</script>
+{% endblock %}
